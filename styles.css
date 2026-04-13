@@ -474,6 +474,26 @@ input {
   color: var(--tertiary);
 }
 
+.warning-badge {
+  display: inline-flex;
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff0e2;
+  border: 1px solid #ffd2ad;
+  color: #8d2f0d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.warning-text {
+  margin-top: 10px;
+  color: #8d2f0d;
+  font-weight: 600;
+}
+
 .side-panel {
   display: none;
   background: rgba(255, 255, 255, 0.8);

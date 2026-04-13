@@ -179,7 +179,7 @@ export const QUESTIONS = [
     branchTags: ["final_validation"],
     style: "confidence",
     type: "confidence",
-    prompt: "Nakolik ti průběžně dává smysl, kam se quiz profilově ubírá?",
+    prompt: "Nakolik ti průběžně dává smysl, kam se kvíz profilově ubírá?",
     hint: "Použito pro finální confidence a případný warning o nízké jistotě."
   }
 ];

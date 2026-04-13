@@ -1,4 +1,4 @@
-import { TRAIT_LABELS } from "../data/traits.js";
+import { getTraitLabel } from '../i18n/results-localization.js';
 
 let chartInstances = [];
 
@@ -21,7 +21,7 @@ function buildChartPalette(count) {
   return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
 }
 
-function renderCharts(rankedSubjects, state, ui) {
+function renderCharts(rankedSubjects, state, ui, locale) {
   destroyCharts();
 
   if (typeof window.Chart === 'undefined') return;
@@ -61,7 +61,7 @@ function renderCharts(rankedSubjects, state, ui) {
   const traitChart = new window.Chart(traitsCanvas, {
     type: 'doughnut',
     data: {
-      labels: topTraits.map(([key]) => TRAIT_LABELS[key] || key),
+      labels: topTraits.map(([key]) => getTraitLabel(key, locale)),
       datasets: [
         {
           data: topTraits.map(([, value]) => Math.round(value * 100)),
@@ -176,9 +176,9 @@ export function renderQuestion(question, state, index, total, ui = {}) {
     const scale = document.createElement('div');
     scale.className = 'scale-row';
     scale.innerHTML = `
-      <div class="small-note">0 = úplně vlevo, 100 = úplně vpravo</div>
+      <div class="small-note">${ui.pairwiseScaleHint || '0 = úplně vlevo, 100 = úplně vpravo'}</div>
       <input type="range" min="0" max="100" value="${initial}" />
-      <div class="muted">Aktuální pozice: <span class="mono">${initial}</span></div>
+      <div class="muted">${ui.pairwiseCurrent || 'Aktuální pozice'}: <span class="mono">${initial}</span></div>
     `;
     const input = scale.querySelector('input');
     const valueBox = scale.querySelector('.mono');
@@ -196,7 +196,7 @@ export function renderQuestion(question, state, index, total, ui = {}) {
     scale.className = 'scale-row';
     scale.innerHTML = `
       <input type="range" min="0" max="100" value="${initial}" />
-      <div class="muted">Jistota: <span class="mono">${initial}</span>/100</div>
+      <div class="muted">${ui.confidenceCurrent || 'Jistota'}: <span class="mono">${initial}</span>/100</div>
     `;
     const input = scale.querySelector('input');
     const valueBox = scale.querySelector('.mono');
@@ -231,7 +231,14 @@ export function collectQuestionAnswer(question) {
   return null;
 }
 
-export function renderResults({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {} }) {
+function modeLabel(mode, ui) {
+  if (mode === 'interest') return ui.modeInterest || mode;
+  if (mode === 'strength') return ui.modeStrength || mode;
+  if (mode === 'career') return ui.modeCareer || mode;
+  return ui.modeBalanced || mode;
+}
+
+export function renderResults({ rankedSubjects, narrative, clusters, whyNot, state, mode, reportStyle = 'detailed', confidence, locale = 'cs', ui = {} }) {
   const t = {
     interpretationLabel: ui.interpretationLabel || 'Interpretace',
     clustersTitle: ui.clustersTitle || 'Silne clustery',
@@ -246,9 +253,18 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
     metricWorkStyle: ui.metricWorkStyle || 'Work-style fit',
     metricMotivation: ui.metricMotivation || 'Motivation fit',
     confidenceLabel: ui.confidenceLabel || 'Confidence',
+    lowConfidenceTag: ui.lowConfidenceTag || 'Lower confidence result',
+    lowConfidenceNote: ui.lowConfidenceNote || 'This result has lower confidence.',
     chartSubjectsTitle: ui.chartSubjectsTitle || 'Rozložení Top 5',
     chartTraitsTitle: ui.chartTraitsTitle || 'Rozložení hlavních rysů'
   };
+
+  const concise = reportStyle === 'concise';
+  const visibleTopCount = concise ? 3 : 5;
+  const visibleClusters = concise ? clusters.slice(0, 2) : clusters;
+  const visibleWhyNot = concise ? whyNot.slice(0, 2) : whyNot;
+  const visibleParagraphs = concise ? narrative.paragraphs.slice(0, 2) : narrative.paragraphs;
+  const confidenceState = confidence?.level || 'medium';
 
   const subjectsChartTitle = document.getElementById('chartSubjectsTitle');
   if (subjectsChartTitle) subjectsChartTitle.textContent = t.chartSubjectsTitle;
@@ -257,7 +273,7 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
 
   const topResults = document.getElementById('topResults');
   topResults.innerHTML = '';
-  rankedSubjects.slice(0, 5).forEach((subject, idx) => {
+  rankedSubjects.slice(0, visibleTopCount).forEach((subject, idx) => {
     const card = document.createElement('div');
     card.className = 'result-card';
     card.innerHTML = `
@@ -276,14 +292,15 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
   });
 
   document.getElementById('narrativeBlock').innerHTML = `
-    <p class="eyebrow">${t.interpretationLabel} · ${mode}</p>
+    <p class="eyebrow">${t.interpretationLabel} · ${modeLabel(mode, ui)}${concise ? ` · ${ui.reportStyleConcise || 'Concise'}` : ` · ${ui.reportStyleDetailed || 'Detailed'}`}</p>
+    ${confidenceState === 'low' ? `<p class="warning-badge">${t.lowConfidenceTag}</p>` : ''}
     <h3>${narrative.title}</h3>
-    ${narrative.paragraphs.map((p) => `<p>${p}</p>`).join('')}
+    ${visibleParagraphs.map((p) => `<p>${p}</p>`).join('')}
   `;
 
   document.getElementById('clusterBlock').innerHTML = `
     <h3>${t.clustersTitle}</h3>
-    ${clusters.map((c) => `<p><strong>${c.cluster}</strong><br>${c.items.join(', ')}</p>`).join('')}
+    ${visibleClusters.map((c) => `<p><strong>${c.cluster}</strong><br>${c.items.join(', ')}</p>`).join('')}
   `;
 
   document.getElementById('conflictBlock').innerHTML = `
@@ -292,22 +309,23 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
       ? `<ul class="simple-list">${state.contradictions.map((c) => `<li class="warning">${c.label}</li>`).join('')}</ul>`
       : `<p>${t.noContradictions}</p>`}
     <p class="muted">${t.confidenceSignals}: ${state.confidenceSignals.length ? state.confidenceSignals.map((n) => Math.round(n * 100)).join(', ') : t.noSignals}</p>
+    ${confidenceState === 'low' ? `<p class="warning-text">${t.lowConfidenceNote}</p>` : ''}
   `;
 
   const sortedTraits = Object.entries(state.traits).sort((a, b) => b[1] - a[1]).slice(0, 8);
   document.getElementById('profileBlock').innerHTML = `
     <h3>${t.profileTitle}</h3>
     <ul class="simple-list">
-      ${sortedTraits.map(([k, v]) => `<li>${TRAIT_LABELS[k] || k}: ${Math.round(v * 100)}</li>`).join('')}
+      ${sortedTraits.map(([k, v]) => `<li>${getTraitLabel(k, locale)}: ${Math.round(v * 100)}</li>`).join('')}
     </ul>
   `;
 
   document.getElementById('whyNotBlock').innerHTML = `
     <h3>${t.whyNotTitle}</h3>
-    ${whyNot.map((item) => `<p><strong>${item.name}</strong><br>${item.whyNot}</p>`).join('')}
+    ${visibleWhyNot.map((item) => `<p><strong>${item.name}</strong><br>${item.whyNot}</p>`).join('')}
   `;
 
-  renderCharts(rankedSubjects, state, t);
+  renderCharts(rankedSubjects, state, t, locale);
 }
 
 function dataUrlToUint8Array(dataUrl) {
@@ -326,7 +344,7 @@ function buildModeLabel(mode, uiStrings) {
   return uiStrings.modeBalanced || mode;
 }
 
-export async function exportResultsToDocx({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {}, uiCs = {}, uiEn = {} }) {
+export async function exportResultsToDocx({ rankedSubjects, narrative, clusters, whyNot, state, mode, reportStyle = 'detailed', ui = {}, uiCs = {}, uiEn = {}, bilingual }) {
   if (!window.docx?.Document || typeof window.saveAs !== 'function') {
     alert(ui.exportUnavailableAlert || 'DOCX knihovna není načtená.');
     return;
@@ -339,18 +357,44 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     TextRun,
     HeadingLevel,
     AlignmentType,
-    ImageRun
+    ImageRun,
+    Table,
+    TableRow,
+    TableCell,
+    WidthType
   } = window.docx;
 
-  const topSubjects = rankedSubjects.slice(0, 5);
-  const topTraits = Object.entries(state.traits)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  const csBundle = bilingual?.cs || { rankedSubjects, narrative, clusters, whyNot, state };
+  const enBundle = bilingual?.en || { rankedSubjects, narrative, clusters, whyNot, state };
 
-  const titleCs = uiCs.exportTitle || 'Vysledky quizu';
+  const titleCs = uiCs.exportTitle || 'Vysledky kvizu';
   const titleEn = uiEn.exportTitle || 'Quiz results';
   const modeCs = buildModeLabel(mode, uiCs);
   const modeEn = buildModeLabel(mode, uiEn);
+  const styleLabel = reportStyle === 'concise'
+    ? `${uiCs.reportStyleConcise || 'Stručný'} / ${uiEn.reportStyleConcise || 'Concise'}`
+    : `${uiCs.reportStyleDetailed || 'Detailní'} / ${uiEn.reportStyleDetailed || 'Detailed'}`;
+
+  const topTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({ children: [
+        new TableCell({ children: [new Paragraph({ text: '#', bold: true })] }),
+        new TableCell({ children: [new Paragraph({ text: `${uiCs.resultsTitle || 'Doporučení'} / ${uiEn.resultsTitle || 'Recommendations'}`, bold: true })] }),
+        new TableCell({ children: [new Paragraph({ text: `${uiCs.confidenceLabel || 'Míra jistoty'} / ${uiEn.confidenceLabel || 'Confidence'}`, bold: true })] })
+      ] }),
+      ...csBundle.rankedSubjects.slice(0, 5).map((subject, index) => {
+        const enSubject = enBundle.rankedSubjects[index];
+        return new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+            new TableCell({ children: [new Paragraph(`${subject.name} / ${enSubject?.name || subject.name}`)] }),
+            new TableCell({ children: [new Paragraph(`${subject.confidence}%`)] })
+          ]
+        });
+      })
+    ]
+  });
 
   const paragraphs = [
     new Paragraph({
@@ -365,30 +409,29 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
         new TextRun({ text: `${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })
       ]
     }),
+    new Paragraph({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}` }),
     new Paragraph({ text: '' }),
     new Paragraph({ text: `Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`, heading: HeadingLevel.HEADING_2 })
   ];
 
-  topSubjects.forEach((subject, index) => {
-    paragraphs.push(
-      new Paragraph({
-        text: `${index + 1}. ${subject.name} (${subject.scores.final}) - ${uiCs.confidenceLabel || 'Mira jistoty'}: ${subject.confidence}% | ${uiEn.confidenceLabel || 'Confidence'}: ${subject.confidence}%`,
-        bullet: { level: 0 }
-      })
-    );
-  });
+  paragraphs.push(topTable);
 
   paragraphs.push(
     new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.interpretationLabel || 'Vysvetleni'} / ${uiEn.interpretationLabel || 'Interpretation'}`, heading: HeadingLevel.HEADING_2 }),
-    new Paragraph({ text: narrative.title }),
-    ...narrative.paragraphs.map((text) => new Paragraph({ text })),
+    new Paragraph({ text: `${uiCs.interpretationLabel || 'Vysvetleni'} (CZ)`, heading: HeadingLevel.HEADING_2 }),
+    new Paragraph({ text: csBundle.narrative.title }),
+    ...csBundle.narrative.paragraphs.map((text) => new Paragraph({ text })),
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, heading: HeadingLevel.HEADING_2 }),
+    new Paragraph({ text: enBundle.narrative.title }),
+    ...enBundle.narrative.paragraphs.map((text) => new Paragraph({ text })),
     new Paragraph({ text: '' }),
     new Paragraph({ text: `${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`, heading: HeadingLevel.HEADING_2 })
   );
 
-  clusters.forEach((cluster) => {
-    paragraphs.push(new Paragraph({ text: `${cluster.cluster}: ${cluster.items.join(', ')}`, bullet: { level: 0 } }));
+  csBundle.clusters.forEach((cluster, index) => {
+    const enCluster = enBundle.clusters[index];
+    paragraphs.push(new Paragraph({ text: `${cluster.cluster}: ${cluster.items.join(', ')} | ${enCluster?.cluster || cluster.cluster}: ${enCluster?.items.join(', ') || ''}`, bullet: { level: 0 } }));
   });
 
   paragraphs.push(
@@ -396,16 +439,17 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     new Paragraph({ text: `${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`, heading: HeadingLevel.HEADING_2 })
   );
 
-  if (state.contradictions.length) {
-    state.contradictions.forEach((item) => {
-      paragraphs.push(new Paragraph({ text: item.label, bullet: { level: 0 } }));
+  if (csBundle.state.contradictions.length) {
+    csBundle.state.contradictions.forEach((item, index) => {
+      const enItem = enBundle.state.contradictions[index];
+      paragraphs.push(new Paragraph({ text: `${item.label} | ${enItem?.label || item.label}`, bullet: { level: 0 } }));
     });
   } else {
     paragraphs.push(new Paragraph({ text: `${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}` }));
   }
 
-  const signals = state.confidenceSignals.length
-    ? state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
+  const signals = csBundle.state.confidenceSignals.length
+    ? csBundle.state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
     : `${uiCs.noSignals || 'zadne'} / ${uiEn.noSignals || 'none'}`;
   paragraphs.push(
     new Paragraph({ text: `${uiCs.confidenceSignals || 'Signaly jistoty'}: ${signals}` }),
@@ -413,8 +457,9 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     new Paragraph({ text: `${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`, heading: HeadingLevel.HEADING_2 })
   );
 
-  topTraits.forEach(([key, value]) => {
-    paragraphs.push(new Paragraph({ text: `${TRAIT_LABELS[key] || key}: ${Math.round(value * 100)}`, bullet: { level: 0 } }));
+  csBundle.narrative.topTraits.forEach((trait, index) => {
+    const enTrait = enBundle.narrative.topTraits[index];
+    paragraphs.push(new Paragraph({ text: `${trait.label}: ${Math.round(trait.value * 100)} | ${enTrait?.label || trait.label}: ${Math.round(trait.value * 100)}`, bullet: { level: 0 } }));
   });
 
   paragraphs.push(
@@ -422,8 +467,10 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     new Paragraph({ text: `${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`, heading: HeadingLevel.HEADING_2 })
   );
 
-  whyNot.forEach((item) => {
+  csBundle.whyNot.forEach((item, index) => {
+    const enItem = enBundle.whyNot[index];
     paragraphs.push(new Paragraph({ text: `${item.name}: ${item.whyNot}`, bullet: { level: 0 } }));
+    if (enItem) paragraphs.push(new Paragraph({ text: `${enItem.name}: ${enItem.whyNot}`, bullet: { level: 1 } }));
   });
 
   const subjectsChartImage = document.getElementById('subjectsPieChart')?.toDataURL('image/png');
@@ -466,7 +513,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
   window.saveAs(blob, ui.exportFileName || 'subject-fit-results.docx');
 }
 
-export function renderDebug(state, rankedSubjects, ui = {}) {
+export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs') {
   const t = {
     debugAnswered: ui.debugAnswered || 'Odpovezeno',
     debugTopTraits: ui.debugTopTraits || 'Top traits',
@@ -477,7 +524,7 @@ export function renderDebug(state, rankedSubjects, ui = {}) {
   const traits = Object.entries(state.traits)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 12)
-    .map(([k, v]) => `<li>${TRAIT_LABELS[k] || k}: ${Math.round(v * 100)}</li>`)
+    .map(([k, v]) => `<li>${getTraitLabel(k, locale)}: ${Math.round(v * 100)}</li>`)
     .join('');
 
   debug.innerHTML = `

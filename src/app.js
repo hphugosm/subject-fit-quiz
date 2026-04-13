@@ -1,15 +1,20 @@
 import { getQuestionPlan } from './engine/adaptive.js';
-import { buildClusters, buildNarrative, buildWhyNot } from './engine/narrative.js';
+import { buildClusters, buildWhyNot } from './engine/narrative.js';
+import { QUESTIONS } from './data/questions.js';
 import { applyAnswer, computeConfidence, createInitialState, scoreSubjects } from './engine/scoring.js';
 import { collectQuestionAnswer, exportResultsToDocx, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
 import { getUiStrings, localizeQuestion } from './i18n/translations.js';
+import { buildLocalizedNarrative, localizeContradictions, localizeRankedSubjects } from './i18n/results-localization.js';
 
 let state = createInitialState();
 let pendingQuestion = null;
 let askedCount = 0;
-const MAX_QUESTIONS = 12;
+const BASE_QUESTIONS = 12;
+const MAX_GUARDRAIL_QUESTIONS = 4;
+let targetQuestionCount = BASE_QUESTIONS;
 let currentMode = 'balanced';
 let currentLocale = 'cs';
+let currentReportStyle = 'detailed';
 const snapshots = [];
 let lastResultsPayload = null;
 
@@ -32,6 +37,9 @@ function applyStaticTexts() {
   setText('resultsEyebrow', t.resultsEyebrow);
   setText('resultsTitle', t.resultsTitle);
   setText('resultModeLabel', t.resultModeLabel);
+  setText('reportStyleLabel', t.reportStyleLabel);
+  setText('reportStyleConcise', t.reportStyleConcise);
+  setText('reportStyleDetailed', t.reportStyleDetailed);
   setText('modeBalanced', t.modeBalanced);
   setText('modeInterest', t.modeInterest);
   setText('modeStrength', t.modeStrength);
@@ -46,7 +54,7 @@ function applyStaticTexts() {
 
 function rerenderActiveView() {
   if (document.body.dataset.activeView === 'quizView' && pendingQuestion) {
-    renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, askedCount, MAX_QUESTIONS, getUiStrings(currentLocale));
+    renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, askedCount, targetQuestionCount, getUiStrings(currentLocale));
     renderLiveDebug();
     return;
   }
@@ -59,20 +67,23 @@ function start() {
   state = createInitialState();
   pendingQuestion = null;
   askedCount = 0;
+  targetQuestionCount = BASE_QUESTIONS;
   snapshots.length = 0;
   currentMode = 'balanced';
+  currentReportStyle = 'detailed';
   document.getElementById('resultMode').value = currentMode;
+  document.getElementById('reportStyle').value = currentReportStyle;
   applyStaticTexts();
   setActiveView('quizView');
   advance();
 }
 
 function advance() {
-  if (askedCount >= MAX_QUESTIONS) return finish();
+  if (askedCount >= targetQuestionCount) return finish();
   pendingQuestion = getQuestionPlan(state);
   if (!pendingQuestion) return finish();
   askedCount += 1;
-  renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, askedCount, MAX_QUESTIONS, getUiStrings(currentLocale));
+  renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, askedCount, targetQuestionCount, getUiStrings(currentLocale));
   renderLiveDebug();
 }
 
@@ -85,7 +96,7 @@ function submitCurrent() {
   }
   snapshots.push(structuredClone(state));
   state = applyAnswer(state, pendingQuestion, payload);
-  if (askedCount >= MAX_QUESTIONS) return finish();
+  if (askedCount >= targetQuestionCount) return finish();
   advance();
 }
 
@@ -97,40 +108,91 @@ function goBack() {
   state = snapshots.pop();
   askedCount = Math.max(0, askedCount - 1);
   pendingQuestion = getQuestionPlan(state);
-  renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, Math.max(1, askedCount), MAX_QUESTIONS, getUiStrings(currentLocale));
+  renderQuestion(localizeQuestion(pendingQuestion, currentLocale), state, Math.max(1, askedCount), targetQuestionCount, getUiStrings(currentLocale));
   setActiveView('quizView');
   renderLiveDebug();
 }
 
+function unresolvedAdaptiveQuestionCount() {
+  const answered = new Set(state.selectedQuestionIds);
+  return QUESTIONS.filter((question) => question.phase === 'adaptive' && !answered.has(question.id)).length;
+}
+
 function finish() {
+  const confidence = computeConfidence(state);
+  const canExtend = askedCount >= BASE_QUESTIONS && askedCount >= targetQuestionCount;
+  if (confidence.level === 'low' && canExtend) {
+    const available = unresolvedAdaptiveQuestionCount();
+    const extraCount = Math.min(MAX_GUARDRAIL_QUESTIONS, available);
+    if (extraCount > 0) {
+      targetQuestionCount = askedCount + extraCount;
+      alert(getUiStrings(currentLocale).lowConfidenceExtendAlert);
+      advance();
+      return;
+    }
+  }
   setActiveView('resultsView');
   updateResults();
 }
 
 function updateResults() {
-  const rankedSubjects = scoreSubjects(state, currentMode);
-  const narrative = buildNarrative(state, rankedSubjects);
+  const confidence = computeConfidence(state);
+  const rankedRaw = scoreSubjects(state, currentMode);
+
+  const rankedSubjects = localizeRankedSubjects(rankedRaw, currentLocale);
+  const narrative = buildLocalizedNarrative(state, rankedSubjects, currentLocale);
   const clusters = buildClusters(rankedSubjects);
   const whyNot = buildWhyNot(rankedSubjects);
+  const localizedState = {
+    ...state,
+    contradictions: localizeContradictions(state.contradictions, currentLocale)
+  };
+
+  const rankedSubjectsCs = localizeRankedSubjects(rankedRaw, 'cs');
+  const rankedSubjectsEn = localizeRankedSubjects(rankedRaw, 'en');
+
   const ui = getUiStrings(currentLocale);
   lastResultsPayload = {
     rankedSubjects,
     narrative,
     clusters,
     whyNot,
-    state,
+    state: localizedState,
     mode: currentMode,
+    reportStyle: currentReportStyle,
+    confidence,
+    locale: currentLocale,
     ui,
     uiCs: getUiStrings('cs'),
-    uiEn: getUiStrings('en')
+    uiEn: getUiStrings('en'),
+    bilingual: {
+      cs: {
+        rankedSubjects: rankedSubjectsCs,
+        narrative: buildLocalizedNarrative(state, rankedSubjectsCs, 'cs'),
+        clusters: buildClusters(rankedSubjectsCs),
+        whyNot: buildWhyNot(rankedSubjectsCs),
+        state: { ...state, contradictions: localizeContradictions(state.contradictions, 'cs') }
+      },
+      en: {
+        rankedSubjects: rankedSubjectsEn,
+        narrative: buildLocalizedNarrative(state, rankedSubjectsEn, 'en'),
+        clusters: buildClusters(rankedSubjectsEn),
+        whyNot: buildWhyNot(rankedSubjectsEn),
+        state: { ...state, contradictions: localizeContradictions(state.contradictions, 'en') }
+      }
+    }
   };
   renderResults(lastResultsPayload);
-  renderDebug(state, rankedSubjects, getUiStrings(currentLocale));
+  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale);
 }
 
 function renderLiveDebug() {
-  const rankedSubjects = scoreSubjects(state, currentMode);
-  renderDebug(state, rankedSubjects, getUiStrings(currentLocale));
+  const rankedSubjects = localizeRankedSubjects(scoreSubjects(state, currentMode), currentLocale);
+  const localizedState = {
+    ...state,
+    contradictions: localizeContradictions(state.contradictions, currentLocale)
+  };
+  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale);
 }
 
 document.getElementById('startBtn').addEventListener('click', start);
@@ -145,6 +207,10 @@ document.getElementById('restartBtn').addEventListener('click', () => {
 });
 document.getElementById('resultMode').addEventListener('change', (e) => {
   currentMode = e.target.value;
+  updateResults();
+});
+document.getElementById('reportStyle').addEventListener('change', (e) => {
+  currentReportStyle = e.target.value;
   updateResults();
 });
 document.getElementById('exportPdfBtn').addEventListener('click', () => {

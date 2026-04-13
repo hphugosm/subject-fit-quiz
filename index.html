@@ -32,7 +32,7 @@
     <section id="introView" class="view active panel editorial-hero">
       <p class="hero-badge" id="heroBadge">Průvodce výběrem předmětů</p>
       <h2 id="heroTitle">Najdi předměty, které ti sednou profilem i stylem práce.</h2>
-      <p class="subtitle" id="heroSubtitle">Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
+      <p class="subtitle" id="heroSubtitle">Krátký adaptivní kvíz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
       <ul class="feature-list">
         <li id="feature1">24 dimenzí profilu</li>
         <li id="feature2">více typů otázek: single, ranked, pairwise, aversion, confidence</li>
@@ -42,7 +42,7 @@
         <li id="feature6">confidence scoring a narativní vysvětlení</li>
       </ul>
       <div class="cta-stack">
-        <button id="startBtn" class="primary" type="button">Začít quiz</button>
+        <button id="startBtn" class="primary" type="button">Začít kvíz</button>
         <p class="small-note" id="durationNote">Zabere cca 5 minut</p>
       </div>
       <blockquote class="pull-quote" id="pullQuote">"Nejde o závazné rozhodnutí, ale o doporučení pro tvůj další rozvoj."</blockquote>
@@ -80,6 +80,13 @@
             <option value="interest" id="modeInterest">Interest fit</option>
             <option value="strength" id="modeStrength">Strength fit</option>
             <option value="career" id="modeCareer">Career utility fit</option>
+          </select>
+        </div>
+        <div class="mode-switch">
+          <label for="reportStyle" id="reportStyleLabel">Styl výsledku</label>
+          <select id="reportStyle">
+            <option value="detailed" id="reportStyleDetailed">Detailní</option>
+            <option value="concise" id="reportStyleConcise">Stručný</option>
           </select>
         </div>
       </div>

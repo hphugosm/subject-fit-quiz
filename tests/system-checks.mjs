@@ -20,6 +20,8 @@ function checkLocalizationCoverage() {
 
   assert(uiCs.exportDocx && uiEn.exportDocx, 'Missing DOCX export labels in UI dictionaries');
   assert(uiCs.chartSubjectsTitle && uiEn.chartSubjectsTitle, 'Missing chart labels in UI dictionaries');
+  assert(uiCs.reportStyleLabel && uiEn.reportStyleLabel, 'Missing report style labels in UI dictionaries');
+  assert(uiCs.reportStyleDetailed && uiEn.reportStyleDetailed, 'Missing detailed style labels in UI dictionaries');
 
   for (const question of QUESTIONS) {
     const localizedCs = localizeQuestion(question, 'cs');
