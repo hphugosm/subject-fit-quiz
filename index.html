@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subject Fit Engine</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Adaptive Recommendation Prototype</p>
+        <h1>Subject Fit Engine</h1>
+        <p class="subtitle">
+          Komplexní kostra pro doporučování povinně volitelných předmětů.
+        </p>
+      </div>
+      <button id="restartBtn" class="ghost">Restart</button>
+    </header>
+
+    <main class="layout">
+      <section class="panel main-panel">
+        <div id="introView" class="view active">
+          <h2>Co tahle kostra umí</h2>
+          <ul class="feature-list">
+            <li>24 dimenzí profilu</li>
+            <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
+            <li>adaptivní výběr další otázky podle informační hodnoty</li>
+            <li>podsložky výsledku: interest, aptitude, motivation, work-style</li>
+            <li>penalizace rozporů a anti-fit faktorů</li>
+            <li>confidence scoring a narativní vysvětlení</li>
+          </ul>
+          <button id="startBtn" class="primary">Spustit quiz</button>
+        </div>
+
+        <div id="quizView" class="view">
+          <div class="quiz-header">
+            <div>
+              <p class="muted" id="questionMeta">Otázka 1</p>
+              <h2 id="questionTitle"></h2>
+              <p id="questionHint" class="hint"></p>
+            </div>
+            <div class="progress-box">
+              <span id="progressText"></span>
+              <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+            </div>
+          </div>
+
+          <div id="questionBody"></div>
+
+          <div class="controls">
+            <button id="backBtn" class="ghost">Zpět</button>
+            <button id="nextBtn" class="primary">Další</button>
+          </div>
+        </div>
+
+        <div id="resultsView" class="view">
+          <div class="results-head">
+            <div>
+              <p class="eyebrow">Výsledek</p>
+              <h2>Top doporučení</h2>
+            </div>
+            <div class="mode-switch">
+              <label for="resultMode">Režim</label>
+              <select id="resultMode">
+                <option value="balanced">Balanced fit</option>
+                <option value="interest">Interest fit</option>
+                <option value="strength">Strength fit</option>
+                <option value="career">Career utility fit</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="topResults" class="results-grid"></div>
+          <div id="narrativeBlock" class="panel nested"></div>
+          <div class="two-col">
+            <div id="clusterBlock" class="panel nested"></div>
+            <div id="conflictBlock" class="panel nested"></div>
+          </div>
+          <div class="two-col">
+            <div id="profileBlock" class="panel nested"></div>
+            <div id="whyNotBlock" class="panel nested"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel side-panel">
+        <h3>Debug / diagnostika</h3>
+        <div id="debugPanel"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
