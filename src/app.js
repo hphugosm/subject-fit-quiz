@@ -1,7 +1,7 @@
 import { getQuestionPlan } from './engine/adaptive.js';
 import { buildClusters, buildNarrative, buildWhyNot } from './engine/narrative.js';
 import { applyAnswer, computeConfidence, createInitialState, scoreSubjects } from './engine/scoring.js';
-import { collectQuestionAnswer, exportResultsToPdf, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
+import { collectQuestionAnswer, exportResultsToDocx, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
 import { getUiStrings, localizeQuestion } from './i18n/translations.js';
 
 let state = createInitialState();
@@ -39,7 +39,7 @@ function applyStaticTexts() {
   setText('debugTitle', t.debugTitle);
   setText('backBtn', t.back);
   setText('nextBtn', t.next);
-  setText('exportPdfBtn', t.exportPdf);
+  setText('exportPdfBtn', t.exportDocx);
   setText('chartSubjectsTitle', t.chartSubjectsTitle);
   setText('chartTraitsTitle', t.chartTraitsTitle);
 }
@@ -113,7 +113,17 @@ function updateResults() {
   const clusters = buildClusters(rankedSubjects);
   const whyNot = buildWhyNot(rankedSubjects);
   const ui = getUiStrings(currentLocale);
-  lastResultsPayload = { rankedSubjects, narrative, clusters, whyNot, state, mode: currentMode, ui };
+  lastResultsPayload = {
+    rankedSubjects,
+    narrative,
+    clusters,
+    whyNot,
+    state,
+    mode: currentMode,
+    ui,
+    uiCs: getUiStrings('cs'),
+    uiEn: getUiStrings('en')
+  };
   renderResults(lastResultsPayload);
   renderDebug(state, rankedSubjects, getUiStrings(currentLocale));
 }
@@ -139,7 +149,7 @@ document.getElementById('resultMode').addEventListener('change', (e) => {
 });
 document.getElementById('exportPdfBtn').addEventListener('click', () => {
   if (!lastResultsPayload) return;
-  exportResultsToPdf(lastResultsPayload);
+  exportResultsToDocx(lastResultsPayload);
 });
 document.getElementById('languageSelect').addEventListener('change', (e) => {
   currentLocale = e.target.value;

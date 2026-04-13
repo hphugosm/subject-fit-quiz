@@ -71,7 +71,7 @@
           <h2 id="resultsTitle">Tvoje nejsilnější doporučení</h2>
         </div>
         <div class="results-actions">
-          <button id="exportPdfBtn" class="ghost" type="button">Export PDF</button>
+          <button id="exportPdfBtn" class="ghost" type="button">Export DOCX</button>
         </div>
         <div class="mode-switch">
           <label for="resultMode" id="resultModeLabel">Režim</label>
@@ -121,7 +121,8 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>

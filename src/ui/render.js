@@ -310,91 +310,160 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
   renderCharts(rankedSubjects, state, t);
 }
 
-export async function exportResultsToPdf({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {} }) {
-  if (!window.jspdf?.jsPDF) {
-    alert('PDF knihovna není načtená.');
+function dataUrlToUint8Array(dataUrl) {
+  const base64 = dataUrl.split(',')[1] || '';
+  const binary = window.atob(base64);
+  const length = binary.length;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function buildModeLabel(mode, uiStrings) {
+  if (mode === 'interest') return uiStrings.modeInterest || mode;
+  if (mode === 'strength') return uiStrings.modeStrength || mode;
+  if (mode === 'career') return uiStrings.modeCareer || mode;
+  return uiStrings.modeBalanced || mode;
+}
+
+export async function exportResultsToDocx({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {}, uiCs = {}, uiEn = {} }) {
+  if (!window.docx?.Document || typeof window.saveAs !== 'function') {
+    alert(ui.exportUnavailableAlert || 'DOCX knihovna není načtená.');
     return;
   }
 
-  const t = {
-    exportTitle: ui.exportTitle || 'Výsledky quizu',
-    interpretationLabel: ui.interpretationLabel || 'Vysvětlení',
-    clustersTitle: ui.clustersTitle || 'Silné skupiny',
-    conflictTitle: ui.conflictTitle || 'Rozpory a jistota',
-    whyNotTitle: ui.whyNotTitle || 'Proč ne jiné směry',
-    confidenceLabel: ui.confidenceLabel || 'Míra jistoty'
-  };
+  const {
+    Document,
+    Packer,
+    Paragraph,
+    TextRun,
+    HeadingLevel,
+    AlignmentType,
+    ImageRun
+  } = window.docx;
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const topSubjects = rankedSubjects.slice(0, 5);
+  const topTraits = Object.entries(state.traits)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
 
-  const subjectsChartCanvas = document.getElementById('subjectsPieChart');
-  const traitsChartCanvas = document.getElementById('traitsPieChart');
-  const subjectsChartImage = subjectsChartCanvas?.toDataURL('image/png');
-  const traitsChartImage = traitsChartCanvas?.toDataURL('image/png');
+  const titleCs = uiCs.exportTitle || 'Vysledky quizu';
+  const titleEn = uiEn.exportTitle || 'Quiz results';
+  const modeCs = buildModeLabel(mode, uiCs);
+  const modeEn = buildModeLabel(mode, uiEn);
 
-  doc.setFillColor(245, 243, 243);
-  doc.rect(24, 24, 548, 794, 'F');
+  const paragraphs = [
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      heading: HeadingLevel.TITLE,
+      children: [new TextRun({ text: `${titleCs} / ${titleEn}`, bold: true })]
+    }),
+    new Paragraph({
+      children: [
+        new TextRun({ text: `${uiCs.resultModeLabel || 'Rezim'}: ${modeCs}`, bold: true }),
+        new TextRun({ text: ' | ' }),
+        new TextRun({ text: `${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })
+      ]
+    }),
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`, heading: HeadingLevel.HEADING_2 })
+  ];
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
-  doc.text(t.exportTitle, 44, 60);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${t.interpretationLabel}: ${mode}`, 44, 78);
-
-  const top = rankedSubjects.slice(0, 5);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Top 5', 44, 110);
-  doc.setFont('helvetica', 'normal');
-  top.forEach((subject, index) => {
-    doc.text(`${index + 1}. ${subject.name} (${subject.scores.final})`, 44, 130 + index * 16);
+  topSubjects.forEach((subject, index) => {
+    paragraphs.push(
+      new Paragraph({
+        text: `${index + 1}. ${subject.name} (${subject.scores.final}) - ${uiCs.confidenceLabel || 'Mira jistoty'}: ${subject.confidence}% | ${uiEn.confidenceLabel || 'Confidence'}: ${subject.confidence}%`,
+        bullet: { level: 0 }
+      })
+    );
   });
 
-  if (subjectsChartImage) doc.addImage(subjectsChartImage, 'PNG', 320, 98, 220, 180);
-  if (traitsChartImage) doc.addImage(traitsChartImage, 'PNG', 320, 292, 220, 180);
+  paragraphs.push(
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiCs.interpretationLabel || 'Vysvetleni'} / ${uiEn.interpretationLabel || 'Interpretation'}`, heading: HeadingLevel.HEADING_2 }),
+    new Paragraph({ text: narrative.title }),
+    ...narrative.paragraphs.map((text) => new Paragraph({ text })),
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`, heading: HeadingLevel.HEADING_2 })
+  );
 
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.interpretationLabel, 44, 240);
-  doc.setFont('helvetica', 'normal');
-  doc.text(doc.splitTextToSize(narrative.title, 250), 44, 258);
-  const paragraphText = narrative.paragraphs.join(' ');
-  doc.text(doc.splitTextToSize(paragraphText, 250), 44, 288);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.clustersTitle, 44, 500);
-  doc.setFont('helvetica', 'normal');
-  clusters.forEach((cluster, index) => {
-    doc.text(`${cluster.cluster}: ${cluster.items.join(', ')}`, 44, 520 + index * 16);
+  clusters.forEach((cluster) => {
+    paragraphs.push(new Paragraph({ text: `${cluster.cluster}: ${cluster.items.join(', ')}`, bullet: { level: 0 } }));
   });
 
-  doc.addPage();
-  doc.setFillColor(245, 243, 243);
-  doc.rect(24, 24, 548, 794, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text(t.conflictTitle, 44, 60);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
+  paragraphs.push(
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`, heading: HeadingLevel.HEADING_2 })
+  );
 
   if (state.contradictions.length) {
-    state.contradictions.forEach((item, index) => {
-      doc.text(`- ${item.label}`, 44, 84 + index * 16);
+    state.contradictions.forEach((item) => {
+      paragraphs.push(new Paragraph({ text: item.label, bullet: { level: 0 } }));
     });
   } else {
-    doc.text('Bez výrazných rozporů.', 44, 84);
+    paragraphs.push(new Paragraph({ text: `${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}` }));
   }
 
-  doc.text(`${t.confidenceLabel}: ${state.confidenceSignals.length ? state.confidenceSignals.map((n) => Math.round(n * 100)).join(', ') : 'žádné'}`, 44, 140);
+  const signals = state.confidenceSignals.length
+    ? state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
+    : `${uiCs.noSignals || 'zadne'} / ${uiEn.noSignals || 'none'}`;
+  paragraphs.push(
+    new Paragraph({ text: `${uiCs.confidenceSignals || 'Signaly jistoty'}: ${signals}` }),
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`, heading: HeadingLevel.HEADING_2 })
+  );
 
-  doc.setFont('helvetica', 'bold');
-  doc.text(t.whyNotTitle, 44, 184);
-  doc.setFont('helvetica', 'normal');
-  whyNot.forEach((item, index) => {
-    doc.text(doc.splitTextToSize(`${item.name}: ${item.whyNot}`, 500), 44, 206 + index * 54);
+  topTraits.forEach(([key, value]) => {
+    paragraphs.push(new Paragraph({ text: `${TRAIT_LABELS[key] || key}: ${Math.round(value * 100)}`, bullet: { level: 0 } }));
   });
 
-  doc.save('subject-fit-results.pdf');
+  paragraphs.push(
+    new Paragraph({ text: '' }),
+    new Paragraph({ text: `${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`, heading: HeadingLevel.HEADING_2 })
+  );
+
+  whyNot.forEach((item) => {
+    paragraphs.push(new Paragraph({ text: `${item.name}: ${item.whyNot}`, bullet: { level: 0 } }));
+  });
+
+  const subjectsChartImage = document.getElementById('subjectsPieChart')?.toDataURL('image/png');
+  const traitsChartImage = document.getElementById('traitsPieChart')?.toDataURL('image/png');
+
+  if (subjectsChartImage) {
+    paragraphs.push(
+      new Paragraph({ text: '' }),
+      new Paragraph({ text: `${uiCs.chartSubjectsTitle || 'Rozlozeni Top 5'} / ${uiEn.chartSubjectsTitle || 'Top 5 distribution'}`, heading: HeadingLevel.HEADING_2 }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: dataUrlToUint8Array(subjectsChartImage),
+            transformation: { width: 420, height: 260 }
+          })
+        ]
+      })
+    );
+  }
+
+  if (traitsChartImage) {
+    paragraphs.push(
+      new Paragraph({ text: '' }),
+      new Paragraph({ text: `${uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu'} / ${uiEn.chartTraitsTitle || 'Main traits distribution'}`, heading: HeadingLevel.HEADING_2 }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: dataUrlToUint8Array(traitsChartImage),
+            transformation: { width: 420, height: 260 }
+          })
+        ]
+      })
+    );
+  }
+
+  const doc = new Document({ sections: [{ children: paragraphs }] });
+  const blob = await Packer.toBlob(doc);
+  window.saveAs(blob, ui.exportFileName || 'subject-fit-results.docx');
 }
 
 export function renderDebug(state, rankedSubjects, ui = {}) {
