@@ -15,6 +15,7 @@ let targetQuestionCount = BASE_QUESTIONS;
 let currentMode = 'balanced';
 let currentLocale = 'cs';
 let currentReportStyle = 'detailed';
+let currentExportLanguage = 'bilingual';
 const snapshots = [];
 let lastResultsPayload = null;
 
@@ -40,6 +41,10 @@ function applyStaticTexts() {
   setText('reportStyleLabel', t.reportStyleLabel);
   setText('reportStyleConcise', t.reportStyleConcise);
   setText('reportStyleDetailed', t.reportStyleDetailed);
+  setText('exportLanguageLabel', t.exportLanguageLabel);
+  setText('exportLanguageBilingual', t.exportLanguageBilingual);
+  setText('exportLanguageCs', t.exportLanguageCs);
+  setText('exportLanguageEn', t.exportLanguageEn);
   setText('modeBalanced', t.modeBalanced);
   setText('modeInterest', t.modeInterest);
   setText('modeStrength', t.modeStrength);
@@ -71,8 +76,10 @@ function start() {
   snapshots.length = 0;
   currentMode = 'balanced';
   currentReportStyle = 'detailed';
+  currentExportLanguage = 'bilingual';
   document.getElementById('resultMode').value = currentMode;
   document.getElementById('reportStyle').value = currentReportStyle;
+  document.getElementById('exportLanguage').value = currentExportLanguage;
   applyStaticTexts();
   setActiveView('quizView');
   advance();
@@ -160,6 +167,7 @@ function updateResults() {
     state: localizedState,
     mode: currentMode,
     reportStyle: currentReportStyle,
+    exportLanguage: currentExportLanguage,
     confidence,
     locale: currentLocale,
     ui,
@@ -211,6 +219,10 @@ document.getElementById('resultMode').addEventListener('change', (e) => {
 });
 document.getElementById('reportStyle').addEventListener('change', (e) => {
   currentReportStyle = e.target.value;
+  updateResults();
+});
+document.getElementById('exportLanguage').addEventListener('change', (e) => {
+  currentExportLanguage = e.target.value;
   updateResults();
 });
 document.getElementById('exportPdfBtn').addEventListener('click', () => {

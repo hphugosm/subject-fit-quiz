@@ -344,7 +344,7 @@ function buildModeLabel(mode, uiStrings) {
   return uiStrings.modeBalanced || mode;
 }
 
-export async function exportResultsToDocx({ rankedSubjects, narrative, clusters, whyNot, state, mode, reportStyle = 'detailed', ui = {}, uiCs = {}, uiEn = {}, bilingual }) {
+export async function exportResultsToDocx({ rankedSubjects, narrative, clusters, whyNot, state, mode, reportStyle = 'detailed', exportLanguage = 'bilingual', ui = {}, uiCs = {}, uiEn = {}, bilingual }) {
   if (!window.docx?.Document || typeof window.saveAs !== 'function') {
     alert(ui.exportUnavailableAlert || 'DOCX knihovna není načtená.');
     return;
@@ -366,6 +366,9 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   const csBundle = bilingual?.cs || { rankedSubjects, narrative, clusters, whyNot, state };
   const enBundle = bilingual?.en || { rankedSubjects, narrative, clusters, whyNot, state };
+  const useCsOnly = exportLanguage === 'cs';
+  const useEnOnly = exportLanguage === 'en';
+  const useBilingual = !useCsOnly && !useEnOnly;
 
   const titleCs = uiCs.exportTitle || 'Vysledky kvizu';
   const titleEn = uiEn.exportTitle || 'Quiz results';
@@ -399,16 +402,16 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     return new Paragraph({ spacing: { after: 90 }, bullet: { level }, children: [new TextRun({ text })] });
   }
 
-  function metricTable(subjects) {
+  function metricTable(subjects, locale = 'cs') {
     return new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
       rows: [
         new TableRow({
           children: [
             new TableCell({ children: [new Paragraph({ text: '#', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: uiCs.resultsTitle || 'Doporučení', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: uiCs.confidenceLabel || 'Míra jistoty', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'Final', bold: true })] })
+            new TableCell({ children: [new Paragraph({ text: locale === 'en' ? (uiEn.resultsTitle || 'Recommendations') : (uiCs.resultsTitle || 'Doporučení'), bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: locale === 'en' ? (uiEn.confidenceLabel || 'Confidence') : (uiCs.confidenceLabel || 'Míra jistoty'), bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: locale === 'en' ? 'Final score' : 'Final', bold: true })] })
           ]
         }),
         ...subjects.slice(0, 5).map((subject, index) => new TableRow({
@@ -423,92 +426,121 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     });
   }
 
-  const paragraphs = [
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      heading: HeadingLevel.TITLE,
-      spacing: { after: 90 },
-      children: [new TextRun({ text: `${titleCs} / ${titleEn}`, bold: true, size: 32 })]
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 80 },
-      children: [
-        new TextRun({ text: `${uiCs.resultModeLabel || 'Rezim'}: ${modeCs}`, bold: true }),
-        new TextRun({ text: ' | ' }),
-        new TextRun({ text: `${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })
-      ]
-    }),
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 120 },
-      children: [new TextRun({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })]
-    }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
-    new Paragraph({ spacing: { after: 160 }, children: [new TextRun({ text: uiCs.exportDocx || 'Export DOCX', bold: true, color: 'B1213C' })] }),
-    bodyParagraph(`${uiCs.heroSubtitle || ''}`),
-    bodyParagraph(`${uiEn.heroSubtitle || ''}`)
-  ];
+  const paragraphs = [];
 
-  paragraphs.push(...sectionTitle(`Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`));
-  paragraphs.push(metricTable(csBundle.rankedSubjects));
+  if (useBilingual) {
+    paragraphs.push(
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        heading: HeadingLevel.TITLE,
+        spacing: { after: 90 },
+        children: [new TextRun({ text: `${titleCs} / ${titleEn}`, bold: true, size: 32 })]
+      }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: `${uiCs.resultModeLabel || 'Rezim'}: ${modeCs} | ${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
+      bodyParagraph(`${uiCs.heroSubtitle || ''}`),
+      bodyParagraph(`${uiEn.heroSubtitle || ''}`)
+    );
 
-  paragraphs.push(...sectionTitle(`${uiCs.interpretationLabel || 'Vysvetleni'} (CZ)`, `${uiCs.profileTitle || 'Hlavní profil'} — ${modeCs}`));
-  paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: csBundle.narrative.title, bold: true, size: 24 })] }));
-  csBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
+    paragraphs.push(...sectionTitle(`Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`));
+    paragraphs.push(metricTable(csBundle.rankedSubjects, 'cs'));
+    paragraphs.push(metricTable(enBundle.rankedSubjects, 'en'));
 
-  paragraphs.push(new Paragraph({ pageBreakBefore: true, spacing: { after: 120 }, children: [new TextRun({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, bold: true, color: 'B1213C' })] }));
-  paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: enBundle.narrative.title, bold: true, size: 24 })] }));
-  enBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
+    paragraphs.push(...sectionTitle(`${uiCs.interpretationLabel || 'Vysvetleni'} (CZ)`, `${uiCs.profileTitle || 'Hlavní profil'} — ${modeCs}`));
+    paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: csBundle.narrative.title, bold: true, size: 24 })] }));
+    csBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
 
-  paragraphs.push(...sectionTitle(`${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`));
+    paragraphs.push(new Paragraph({ pageBreakBefore: true, spacing: { after: 120 }, children: [new TextRun({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, bold: true, color: 'B1213C' })] }));
+    paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: enBundle.narrative.title, bold: true, size: 24 })] }));
+    enBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
 
-  csBundle.clusters.forEach((cluster, index) => {
-    const enCluster = enBundle.clusters[index];
-    paragraphs.push(bulletParagraph(`${cluster.cluster}: ${cluster.items.join(', ')}`));
-    if (enCluster) paragraphs.push(bulletParagraph(`${enCluster.cluster}: ${enCluster.items.join(', ')}`, 1));
-  });
-
-  paragraphs.push(...sectionTitle(`${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`));
-
-  if (csBundle.state.contradictions.length) {
-    csBundle.state.contradictions.forEach((item, index) => {
-      const enItem = enBundle.state.contradictions[index];
-      paragraphs.push(bulletParagraph(item.label));
-      if (enItem) paragraphs.push(bulletParagraph(enItem.label, 1));
+    paragraphs.push(...sectionTitle(`${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`));
+    csBundle.clusters.forEach((cluster, index) => {
+      const enCluster = enBundle.clusters[index];
+      paragraphs.push(bulletParagraph(`${cluster.cluster}: ${cluster.items.join(', ')}`));
+      if (enCluster) paragraphs.push(bulletParagraph(`${enCluster.cluster}: ${enCluster.items.join(', ')}`, 1));
     });
-  } else {
-    paragraphs.push(bodyParagraph(`${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}`));
+
+    paragraphs.push(...sectionTitle(`${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`));
+    if (csBundle.state.contradictions.length) {
+      csBundle.state.contradictions.forEach((item, index) => {
+        const enItem = enBundle.state.contradictions[index];
+        paragraphs.push(bulletParagraph(item.label));
+        if (enItem) paragraphs.push(bulletParagraph(enItem.label, 1));
+      });
+    } else {
+      paragraphs.push(bodyParagraph(`${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}`));
+    }
+
+    const signals = csBundle.state.confidenceSignals.length
+      ? csBundle.state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
+      : `${uiCs.noSignals || 'zadne'} / ${uiEn.noSignals || 'none'}`;
+    paragraphs.push(bodyParagraph(`${uiCs.confidenceSignals || 'Signály jistoty'}: ${signals}`));
+
+    paragraphs.push(...sectionTitle(`${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`));
+    csBundle.narrative.topTraits.forEach((trait, index) => {
+      const enTrait = enBundle.narrative.topTraits[index];
+      paragraphs.push(bulletParagraph(`${trait.label}: ${Math.round(trait.value * 100)}`));
+      if (enTrait) paragraphs.push(bulletParagraph(`${enTrait.label}: ${Math.round(enTrait.value * 100)}`, 1));
+    });
+
+    paragraphs.push(...sectionTitle(`${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`));
+    csBundle.whyNot.forEach((item, index) => {
+      const enItem = enBundle.whyNot[index];
+      paragraphs.push(bulletParagraph(`${item.name}: ${item.whyNot}`));
+      if (enItem) paragraphs.push(bulletParagraph(`${enItem.name}: ${enItem.whyNot}`, 1));
+    });
+  } else if (useCsOnly || useEnOnly) {
+    const locale = useEnOnly ? 'en' : 'cs';
+    const bundle = useEnOnly ? enBundle : csBundle;
+    const u = useEnOnly ? uiEn : uiCs;
+    paragraphs.push(
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, heading: HeadingLevel.TITLE, spacing: { after: 90 }, children: [new TextRun({ text: useEnOnly ? titleEn : titleCs, bold: true, size: 32 })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: `${u.resultModeLabel || 'Mode'}: ${useEnOnly ? modeEn : modeCs}`, bold: true })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: `${u.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
+      bodyParagraph(useEnOnly ? uiEn.heroSubtitle || '' : uiCs.heroSubtitle || '')
+    );
+
+    paragraphs.push(...sectionTitle(useEnOnly ? `${u.interpretationLabel || 'Interpretation'}` : `${u.interpretationLabel || 'Vysvetleni'}`, `${u.profileTitle || 'Main profile'} — ${useEnOnly ? modeEn : modeCs}`));
+    paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: bundle.narrative.title, bold: true, size: 24 })] }));
+    bundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
+
+    paragraphs.push(...sectionTitle(u.clustersTitle || 'Clusters'));
+    bundle.clusters.forEach((cluster) => paragraphs.push(bulletParagraph(`${cluster.cluster}: ${cluster.items.join(', ')}`)));
+
+    paragraphs.push(...sectionTitle(u.conflictTitle || 'Conflicts and confidence'));
+    if (bundle.state.contradictions.length) {
+      bundle.state.contradictions.forEach((item) => paragraphs.push(bulletParagraph(item.label)));
+    } else {
+      paragraphs.push(bodyParagraph(u.noContradictions || 'No major contradictions.'));
+    }
+
+    const signals = bundle.state.confidenceSignals.length
+      ? bundle.state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
+      : u.noSignals || 'none';
+    paragraphs.push(bodyParagraph(`${u.confidenceSignals || 'Confidence signals'}: ${signals}`));
+
+    paragraphs.push(...sectionTitle(u.profileTitle || 'Main profile'));
+    bundle.narrative.topTraits.forEach((trait) => {
+      paragraphs.push(bulletParagraph(`${trait.label}: ${Math.round(trait.value * 100)}`));
+    });
+
+    paragraphs.push(...sectionTitle(u.whyNotTitle || 'Why not other directions'));
+    bundle.whyNot.forEach((item) => {
+      paragraphs.push(bulletParagraph(`${item.name}: ${item.whyNot}`));
+    });
   }
-
-  const signals = csBundle.state.confidenceSignals.length
-    ? csBundle.state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
-    : `${uiCs.noSignals || 'zadne'} / ${uiEn.noSignals || 'none'}`;
-  paragraphs.push(bodyParagraph(`${uiCs.confidenceSignals || 'Signály jistoty'}: ${signals}`));
-
-  paragraphs.push(...sectionTitle(`${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`));
-
-  csBundle.narrative.topTraits.forEach((trait, index) => {
-    const enTrait = enBundle.narrative.topTraits[index];
-    paragraphs.push(bulletParagraph(`${trait.label}: ${Math.round(trait.value * 100)}`));
-    if (enTrait) paragraphs.push(bulletParagraph(`${enTrait.label}: ${Math.round(enTrait.value * 100)}`, 1));
-  });
-
-  paragraphs.push(...sectionTitle(`${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`));
-
-  csBundle.whyNot.forEach((item, index) => {
-    const enItem = enBundle.whyNot[index];
-    paragraphs.push(bulletParagraph(`${item.name}: ${item.whyNot}`));
-    if (enItem) paragraphs.push(bulletParagraph(`${enItem.name}: ${enItem.whyNot}`, 1));
-  });
 
   const subjectsChartImage = document.getElementById('subjectsPieChart')?.toDataURL('image/png');
   const traitsChartImage = document.getElementById('traitsPieChart')?.toDataURL('image/png');
 
   if (subjectsChartImage) {
     paragraphs.push(
-      ...sectionTitle(`${uiCs.chartSubjectsTitle || 'Rozlozeni Top 5'} / ${uiEn.chartSubjectsTitle || 'Top 5 distribution'}`),
+      ...sectionTitle(useBilingual ? `${uiCs.chartSubjectsTitle || 'Rozlozeni Top 5'} / ${uiEn.chartSubjectsTitle || 'Top 5 distribution'}` : (useEnOnly ? uiEn.chartSubjectsTitle || 'Top 5 distribution' : uiCs.chartSubjectsTitle || 'Rozlozeni Top 5')),
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 120 },
@@ -524,7 +556,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   if (traitsChartImage) {
     paragraphs.push(
-      ...sectionTitle(`${uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu'} / ${uiEn.chartTraitsTitle || 'Main traits distribution'}`),
+      ...sectionTitle(useBilingual ? `${uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu'} / ${uiEn.chartTraitsTitle || 'Main traits distribution'}` : (useEnOnly ? uiEn.chartTraitsTitle || 'Main traits distribution' : uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu')),
       new Paragraph({
         alignment: AlignmentType.CENTER,
         spacing: { after: 120 },
@@ -540,7 +572,8 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   const doc = new Document({ sections: [{ children: paragraphs }] });
   const blob = await Packer.toBlob(doc);
-  window.saveAs(blob, ui.exportFileName || 'subject-fit-results.docx');
+  const fileBase = useBilingual ? 'subject-fit-results-bilingual' : useEnOnly ? 'subject-fit-results-en' : 'subject-fit-results-cs';
+  window.saveAs(blob, `${fileBase}.docx`);
 }
 
 export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs') {

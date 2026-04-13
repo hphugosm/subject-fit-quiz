@@ -287,6 +287,10 @@ input {
   gap: 12px;
 }
 
+.results-head > .mode-switch {
+  max-width: 260px;
+}
+
 .results-actions {
   display: flex;
   justify-content: flex-start;
@@ -642,6 +646,26 @@ input:focus-visible {
 }
 
 @media (max-width: 899px) {
+  .topbar {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .results-head {
+    gap: 10px;
+  }
+
+  .results-head > .mode-switch,
+  .results-actions {
+    max-width: none;
+    width: 100%;
+  }
+
   .results-actions {
     position: sticky;
     top: 74px;
@@ -654,6 +678,10 @@ input:focus-visible {
 
   #exportPdfBtn {
     width: 100%;
+  }
+
+  .mode-switch select {
+    max-width: none;
   }
 }
 
