@@ -375,102 +375,132 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     ? `${uiCs.reportStyleConcise || 'Stručný'} / ${uiEn.reportStyleConcise || 'Concise'}`
     : `${uiCs.reportStyleDetailed || 'Detailní'} / ${uiEn.reportStyleDetailed || 'Detailed'}`;
 
-  const topTable = new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
-    rows: [
-      new TableRow({ children: [
-        new TableCell({ children: [new Paragraph({ text: '#', bold: true })] }),
-        new TableCell({ children: [new Paragraph({ text: `${uiCs.resultsTitle || 'Doporučení'} / ${uiEn.resultsTitle || 'Recommendations'}`, bold: true })] }),
-        new TableCell({ children: [new Paragraph({ text: `${uiCs.confidenceLabel || 'Míra jistoty'} / ${uiEn.confidenceLabel || 'Confidence'}`, bold: true })] })
-      ] }),
-      ...csBundle.rankedSubjects.slice(0, 5).map((subject, index) => {
-        const enSubject = enBundle.rankedSubjects[index];
-        return new TableRow({
-          children: [
-            new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
-            new TableCell({ children: [new Paragraph(`${subject.name} / ${enSubject?.name || subject.name}`)] }),
-            new TableCell({ children: [new Paragraph(`${subject.confidence}%`)] })
-          ]
-        });
-      })
-    ]
+  const reportTimestamp = new Date().toLocaleString(ui.exportLocale || 'cs-CZ', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
   });
 
+  function sectionTitle(text, subtitle = '') {
+    return [
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({ text, bold: true, color: 'B1213C' })]
+      }),
+      subtitle ? new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: subtitle, italics: true, color: '665255' })] }) : null
+    ].filter(Boolean);
+  }
+
+  function bodyParagraph(text) {
+    return new Paragraph({ spacing: { after: 110 }, children: [new TextRun({ text })] });
+  }
+
+  function bulletParagraph(text, level = 0) {
+    return new Paragraph({ spacing: { after: 90 }, bullet: { level }, children: [new TextRun({ text })] });
+  }
+
+  function metricTable(subjects) {
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph({ text: '#', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: uiCs.resultsTitle || 'Doporučení', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: uiCs.confidenceLabel || 'Míra jistoty', bold: true })] }),
+            new TableCell({ children: [new Paragraph({ text: 'Final', bold: true })] })
+          ]
+        }),
+        ...subjects.slice(0, 5).map((subject, index) => new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph(`${index + 1}`)] }),
+            new TableCell({ children: [new Paragraph(subject.name)] }),
+            new TableCell({ children: [new Paragraph(`${subject.confidence}%`)] }),
+            new TableCell({ children: [new Paragraph(`${subject.scores.final}`)] })
+          ]
+        }))
+      ]
+    });
+  }
+
   const paragraphs = [
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
     new Paragraph({
       alignment: AlignmentType.CENTER,
       heading: HeadingLevel.TITLE,
-      children: [new TextRun({ text: `${titleCs} / ${titleEn}`, bold: true })]
+      spacing: { after: 90 },
+      children: [new TextRun({ text: `${titleCs} / ${titleEn}`, bold: true, size: 32 })]
     }),
     new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 80 },
       children: [
         new TextRun({ text: `${uiCs.resultModeLabel || 'Rezim'}: ${modeCs}`, bold: true }),
         new TextRun({ text: ' | ' }),
         new TextRun({ text: `${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })
       ]
     }),
-    new Paragraph({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}` }),
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`, heading: HeadingLevel.HEADING_2 })
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+      children: [new TextRun({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })]
+    }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
+    new Paragraph({ spacing: { after: 160 }, children: [new TextRun({ text: uiCs.exportDocx || 'Export DOCX', bold: true, color: 'B1213C' })] }),
+    bodyParagraph(`${uiCs.heroSubtitle || ''}`),
+    bodyParagraph(`${uiEn.heroSubtitle || ''}`)
   ];
 
-  paragraphs.push(topTable);
+  paragraphs.push(...sectionTitle(`Top 5 ${uiCs.resultsTitle || 'doporuceni'} / Top 5 ${uiEn.resultsTitle || 'recommendations'}`));
+  paragraphs.push(metricTable(csBundle.rankedSubjects));
 
-  paragraphs.push(
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.interpretationLabel || 'Vysvetleni'} (CZ)`, heading: HeadingLevel.HEADING_2 }),
-    new Paragraph({ text: csBundle.narrative.title }),
-    ...csBundle.narrative.paragraphs.map((text) => new Paragraph({ text })),
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, heading: HeadingLevel.HEADING_2 }),
-    new Paragraph({ text: enBundle.narrative.title }),
-    ...enBundle.narrative.paragraphs.map((text) => new Paragraph({ text })),
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`, heading: HeadingLevel.HEADING_2 })
-  );
+  paragraphs.push(...sectionTitle(`${uiCs.interpretationLabel || 'Vysvetleni'} (CZ)`, `${uiCs.profileTitle || 'Hlavní profil'} — ${modeCs}`));
+  paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: csBundle.narrative.title, bold: true, size: 24 })] }));
+  csBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
+
+  paragraphs.push(new Paragraph({ pageBreakBefore: true, spacing: { after: 120 }, children: [new TextRun({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, bold: true, color: 'B1213C' })] }));
+  paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: enBundle.narrative.title, bold: true, size: 24 })] }));
+  enBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
+
+  paragraphs.push(...sectionTitle(`${uiCs.clustersTitle || 'Silne skupiny'} / ${uiEn.clustersTitle || 'Strong clusters'}`));
 
   csBundle.clusters.forEach((cluster, index) => {
     const enCluster = enBundle.clusters[index];
-    paragraphs.push(new Paragraph({ text: `${cluster.cluster}: ${cluster.items.join(', ')} | ${enCluster?.cluster || cluster.cluster}: ${enCluster?.items.join(', ') || ''}`, bullet: { level: 0 } }));
+    paragraphs.push(bulletParagraph(`${cluster.cluster}: ${cluster.items.join(', ')}`));
+    if (enCluster) paragraphs.push(bulletParagraph(`${enCluster.cluster}: ${enCluster.items.join(', ')}`, 1));
   });
 
-  paragraphs.push(
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`, heading: HeadingLevel.HEADING_2 })
-  );
+  paragraphs.push(...sectionTitle(`${uiCs.conflictTitle || 'Rozpory a jistota'} / ${uiEn.conflictTitle || 'Conflicts and confidence'}`));
 
   if (csBundle.state.contradictions.length) {
     csBundle.state.contradictions.forEach((item, index) => {
       const enItem = enBundle.state.contradictions[index];
-      paragraphs.push(new Paragraph({ text: `${item.label} | ${enItem?.label || item.label}`, bullet: { level: 0 } }));
+      paragraphs.push(bulletParagraph(item.label));
+      if (enItem) paragraphs.push(bulletParagraph(enItem.label, 1));
     });
   } else {
-    paragraphs.push(new Paragraph({ text: `${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}` }));
+    paragraphs.push(bodyParagraph(`${uiCs.noContradictions || 'Bez vyraznych rozporu.'} / ${uiEn.noContradictions || 'No major contradictions.'}`));
   }
 
   const signals = csBundle.state.confidenceSignals.length
     ? csBundle.state.confidenceSignals.map((value) => Math.round(value * 100)).join(', ')
     : `${uiCs.noSignals || 'zadne'} / ${uiEn.noSignals || 'none'}`;
-  paragraphs.push(
-    new Paragraph({ text: `${uiCs.confidenceSignals || 'Signaly jistoty'}: ${signals}` }),
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`, heading: HeadingLevel.HEADING_2 })
-  );
+  paragraphs.push(bodyParagraph(`${uiCs.confidenceSignals || 'Signály jistoty'}: ${signals}`));
+
+  paragraphs.push(...sectionTitle(`${uiCs.profileTitle || 'Hlavni profil'} / ${uiEn.profileTitle || 'Main profile'}`));
 
   csBundle.narrative.topTraits.forEach((trait, index) => {
     const enTrait = enBundle.narrative.topTraits[index];
-    paragraphs.push(new Paragraph({ text: `${trait.label}: ${Math.round(trait.value * 100)} | ${enTrait?.label || trait.label}: ${Math.round(trait.value * 100)}`, bullet: { level: 0 } }));
+    paragraphs.push(bulletParagraph(`${trait.label}: ${Math.round(trait.value * 100)}`));
+    if (enTrait) paragraphs.push(bulletParagraph(`${enTrait.label}: ${Math.round(enTrait.value * 100)}`, 1));
   });
 
-  paragraphs.push(
-    new Paragraph({ text: '' }),
-    new Paragraph({ text: `${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`, heading: HeadingLevel.HEADING_2 })
-  );
+  paragraphs.push(...sectionTitle(`${uiCs.whyNotTitle || 'Proc ne jine smery'} / ${uiEn.whyNotTitle || 'Why not other directions'}`));
 
   csBundle.whyNot.forEach((item, index) => {
     const enItem = enBundle.whyNot[index];
-    paragraphs.push(new Paragraph({ text: `${item.name}: ${item.whyNot}`, bullet: { level: 0 } }));
-    if (enItem) paragraphs.push(new Paragraph({ text: `${enItem.name}: ${enItem.whyNot}`, bullet: { level: 1 } }));
+    paragraphs.push(bulletParagraph(`${item.name}: ${item.whyNot}`));
+    if (enItem) paragraphs.push(bulletParagraph(`${enItem.name}: ${enItem.whyNot}`, 1));
   });
 
   const subjectsChartImage = document.getElementById('subjectsPieChart')?.toDataURL('image/png');
@@ -478,14 +508,14 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   if (subjectsChartImage) {
     paragraphs.push(
-      new Paragraph({ text: '' }),
-      new Paragraph({ text: `${uiCs.chartSubjectsTitle || 'Rozlozeni Top 5'} / ${uiEn.chartSubjectsTitle || 'Top 5 distribution'}`, heading: HeadingLevel.HEADING_2 }),
+      ...sectionTitle(`${uiCs.chartSubjectsTitle || 'Rozlozeni Top 5'} / ${uiEn.chartSubjectsTitle || 'Top 5 distribution'}`),
       new Paragraph({
         alignment: AlignmentType.CENTER,
+        spacing: { after: 120 },
         children: [
           new ImageRun({
             data: dataUrlToUint8Array(subjectsChartImage),
-            transformation: { width: 420, height: 260 }
+            transformation: { width: 440, height: 272 }
           })
         ]
       })
@@ -494,14 +524,14 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   if (traitsChartImage) {
     paragraphs.push(
-      new Paragraph({ text: '' }),
-      new Paragraph({ text: `${uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu'} / ${uiEn.chartTraitsTitle || 'Main traits distribution'}`, heading: HeadingLevel.HEADING_2 }),
+      ...sectionTitle(`${uiCs.chartTraitsTitle || 'Rozlozeni hlavnich rysu'} / ${uiEn.chartTraitsTitle || 'Main traits distribution'}`),
       new Paragraph({
         alignment: AlignmentType.CENTER,
+        spacing: { after: 120 },
         children: [
           new ImageRun({
             data: dataUrlToUint8Array(traitsChartImage),
-            transformation: { width: 420, height: 260 }
+            transformation: { width: 440, height: 272 }
           })
         ]
       })
