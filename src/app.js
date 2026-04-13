@@ -51,7 +51,7 @@ function goBack() {
   state = snapshots.pop();
   askedCount = Math.max(0, askedCount - 1);
   pendingQuestion = getQuestionPlan(state);
-  renderQuestion(pendingQuestion, state, Math.max(1, askedCount + 1), MAX_QUESTIONS);
+  renderQuestion(pendingQuestion, state, Math.max(1, askedCount), MAX_QUESTIONS);
   setActiveView('quizView');
   renderLiveDebug();
 }

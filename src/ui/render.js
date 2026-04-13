@@ -19,8 +19,11 @@ export function renderQuestion(question, state, index, total) {
   if (question.type === 'single') {
     const wrap = document.createElement('div');
     wrap.className = 'option-list';
+    const preselected = state.answers[question.id]?.optionId;
+    if (preselected) wrap.dataset.selected = preselected;
     question.options.forEach((option) => {
       const card = document.createElement('button');
+      card.type = 'button';
       card.className = 'option-card';
       if (state.answers[question.id]?.optionId === option.id) card.classList.add('selected');
       card.innerHTML = `<strong>${option.label}</strong>`;
@@ -49,6 +52,7 @@ export function renderQuestion(question, state, index, total) {
         const controls = document.createElement('div');
         controls.className = 'rank-controls';
         const up = document.createElement('button');
+        up.type = 'button';
         up.className = 'ghost';
         up.textContent = '↑';
         up.disabled = idx === 0;
@@ -57,6 +61,7 @@ export function renderQuestion(question, state, index, total) {
           redraw();
         };
         const down = document.createElement('button');
+        down.type = 'button';
         down.className = 'ghost';
         down.textContent = '↓';
         down.disabled = idx === order.length - 1;
