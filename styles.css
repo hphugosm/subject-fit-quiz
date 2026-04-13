@@ -19,6 +19,7 @@ body {
 }
 button, select {
   font: inherit;
+  color: var(--text);
 }
 .app-shell {
   max-width: 1240px;
@@ -102,6 +103,7 @@ button, select {
   border-radius: 12px;
   padding: 14px;
   background: #101010;
+  color: var(--text);
   cursor: pointer;
 }
 .option-card.selected {
