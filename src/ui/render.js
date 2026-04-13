@@ -3,6 +3,7 @@ import { TRAIT_LABELS } from "../data/traits.js";
 export function setActiveView(viewId) {
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   document.getElementById(viewId).classList.add('active');
+  document.body.dataset.activeView = viewId;
 }
 
 export function renderQuestion(question, state, index, total) {
