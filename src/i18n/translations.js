@@ -1,7 +1,8 @@
 const CS = {
-  brandEyebrow: 'Academic Vanguard',
+  brandEyebrow: 'Powered by Tým Trampolin for ACGA',
   restart: 'Restart',
   heroBadge: 'Průvodce výběrem předmětů',
+  siteTitle: 'Subject Fit Engine',
   heroTitle: 'Najdi předměty, které ti sedí obsahem i stylem práce.',
   heroSubtitle: 'Krátký chytrý kvíz ukáže, co tě nejvíc vystihuje, a doporučí vhodné směry.',
   features: [
@@ -65,9 +66,10 @@ const CS = {
 };
 
 const EN = {
-  brandEyebrow: 'Academic Vanguard',
+  brandEyebrow: 'Powered by Tým Trampolin for ACGA',
   restart: 'Restart',
   heroBadge: 'Subject selection guide',
+  siteTitle: 'Subject Fit Engine',
   heroTitle: 'Find subjects that match both your interests and your way of working.',
   heroSubtitle: 'A short smart quiz shows what fits you best and recommends suitable directions.',
   features: [

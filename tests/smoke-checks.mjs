@@ -12,6 +12,7 @@ function checkDomHooks() {
     'startBtn',
     'restartBtn',
     'languageSelect',
+    'siteTitle',
     'nextBtn',
     'backBtn',
     'introView',

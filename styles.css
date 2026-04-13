@@ -4,14 +4,14 @@
   --surface-card: #ffffff;
   --text: #17191b;
   --muted: #5f5050;
-  --primary: #b1213c;
-  --primary-2: #dd5b4f;
-  --secondary: #0c5f5d;
-  --tertiary: #8e2f0d;
-  --outline: #d9c1b8;
-  --outline-strong: #c6a296;
-  --shadow-soft: 0 14px 36px rgba(37, 16, 16, 0.08);
-  --shadow-card: 0 20px 44px rgba(29, 17, 14, 0.11);
+  --primary: #1e7f52;
+  --primary-2: #56b56d;
+  --secondary: #0f5e3d;
+  --tertiary: #48633b;
+  --outline: #c7dccf;
+  --outline-strong: #9fc5af;
+  --shadow-soft: 0 14px 36px rgba(16, 53, 32, 0.08);
+  --shadow-card: 0 20px 44px rgba(16, 53, 32, 0.11);
 }
 
 * {
@@ -23,9 +23,9 @@ body {
   font-family: "Public Sans", system-ui, -apple-system, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(960px 540px at 105% -5%, #ffd8bf 0%, transparent 60%),
+    radial-gradient(960px 540px at 105% -5%, #c9f0d1 0%, transparent 60%),
     radial-gradient(760px 480px at -15% 5%, #dcefe9 0%, transparent 56%),
-    linear-gradient(180deg, #f9f6f2 0%, var(--surface) 55%, #f4ede7 100%);
+    linear-gradient(180deg, #f9f6f2 0%, var(--surface) 55%, #f1f6f1 100%);
   min-height: 100vh;
 }
 
@@ -80,14 +80,38 @@ input {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  color: inherit;
 }
 
-.brand-dot {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 8px 18px rgba(177, 33, 60, 0.35);
+.brand-link {
+  align-items: center;
+}
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #176a43 0%, #47aa5f 100%);
+  color: #fff;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 10px 20px rgba(23, 106, 67, 0.28);
+}
+
+.brand-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-copy .eyebrow {
+  text-transform: none;
+  letter-spacing: 0.03em;
+  font-size: 0.75rem;
 }
 
 .eyebrow {
@@ -96,7 +120,7 @@ input {
   font-size: 0.67rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--secondary);
   text-transform: uppercase;
 }
 
@@ -111,17 +135,20 @@ input {
 .topbar h1 {
   font-size: 1.18rem;
   font-weight: 800;
+  color: var(--secondary);
 }
 
 .panel h2 {
   font-size: 1.95rem;
   line-height: 1.08;
   font-weight: 900;
+  color: var(--secondary);
 }
 
 .panel h3,
 .nested h3 {
   font-size: 1.1rem;
+  color: var(--secondary);
 }
 
 .icon-btn,
@@ -221,7 +248,7 @@ input {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5b4346;
+  color: var(--secondary);
 }
 
 .subtitle,
@@ -258,7 +285,7 @@ input {
   padding: 16px;
   border-radius: 16px;
   background: #fff;
-  color: var(--tertiary);
+  color: var(--secondary);
   font-size: 1.06rem;
   font-style: italic;
   line-height: 1.45;
@@ -485,7 +512,7 @@ input {
   border-radius: 999px;
   background: #fff0e2;
   border: 1px solid #ffd2ad;
-  color: #8d2f0d;
+  color: #0f5e3d;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -494,7 +521,7 @@ input {
 
 .warning-text {
   margin-top: 10px;
-  color: #8d2f0d;
+  color: #0f5e3d;
   font-weight: 600;
 }
 
@@ -550,7 +577,7 @@ body[data-active-view="quizView"] .footer-shell {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--secondary);
 }
 
 .mode-switch select {
@@ -654,6 +681,14 @@ input:focus-visible {
   .topbar-actions {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .brand-wrap {
+    width: 100%;
+  }
+
+  .brand-copy h1 {
+    font-size: 1.05rem;
   }
 
   .results-head {

@@ -388,7 +388,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
       new Paragraph({
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 240, after: 120 },
-        children: [new TextRun({ text, bold: true, color: 'B1213C' })]
+        children: [new TextRun({ text, bold: true, color: '1E7F52' })]
       }),
       subtitle ? new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: subtitle, italics: true, color: '665255' })] }) : null
     ].filter(Boolean);
@@ -430,7 +430,8 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
 
   if (useBilingual) {
     paragraphs.push(
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: 'Powered by Tým Trampolin for ACGA', bold: true, color: '1E7F52' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: 'ACGA', bold: true, color: '1E7F52', size: 22 })] }),
       new Paragraph({
         alignment: AlignmentType.CENTER,
         heading: HeadingLevel.TITLE,
@@ -439,7 +440,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
       }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: `${uiCs.resultModeLabel || 'Rezim'}: ${modeCs} | ${uiEn.resultModeLabel || 'Mode'}: ${modeEn}`, bold: true })] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: `${uiCs.reportStyleLabel || 'Styl výsledku'} / ${uiEn.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '4D6C4F' })] }),
       bodyParagraph(`${uiCs.heroSubtitle || ''}`),
       bodyParagraph(`${uiEn.heroSubtitle || ''}`)
     );
@@ -452,7 +453,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: csBundle.narrative.title, bold: true, size: 24 })] }));
     csBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
 
-    paragraphs.push(new Paragraph({ pageBreakBefore: true, spacing: { after: 120 }, children: [new TextRun({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, bold: true, color: 'B1213C' })] }));
+    paragraphs.push(new Paragraph({ pageBreakBefore: true, spacing: { after: 120 }, children: [new TextRun({ text: `${uiEn.interpretationLabel || 'Interpretation'} (EN)`, bold: true, color: '1E7F52' })] }));
     paragraphs.push(new Paragraph({ spacing: { after: 120 }, children: [new TextRun({ text: enBundle.narrative.title, bold: true, size: 24 })] }));
     enBundle.narrative.paragraphs.forEach((text) => paragraphs.push(bodyParagraph(text)));
 
@@ -497,11 +498,12 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
     const bundle = useEnOnly ? enBundle : csBundle;
     const u = useEnOnly ? uiEn : uiCs;
     paragraphs.push(
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 140 }, children: [new TextRun({ text: 'Academic Vanguard', bold: true, color: 'B1213C' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: 'Powered by Tým Trampolin for ACGA', bold: true, color: '1E7F52' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: 'ACGA', bold: true, color: '1E7F52', size: 22 })] }),
       new Paragraph({ alignment: AlignmentType.CENTER, heading: HeadingLevel.TITLE, spacing: { after: 90 }, children: [new TextRun({ text: useEnOnly ? titleEn : titleCs, bold: true, size: 32 })] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: `${u.resultModeLabel || 'Mode'}: ${useEnOnly ? modeEn : modeCs}`, bold: true })] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: `${u.reportStyleLabel || 'Result style'}: ${styleLabel}`, italics: true, color: '665255' })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '6F5A5B' })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new TextRun({ text: reportTimestamp, size: 18, color: '4D6C4F' })] }),
       bodyParagraph(useEnOnly ? uiEn.heroSubtitle || '' : uiCs.heroSubtitle || '')
     );
 
@@ -545,7 +547,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
         alignment: AlignmentType.CENTER,
         spacing: { after: 120 },
         children: [
-          new ImageRun({
+            new ImageRun({
             data: dataUrlToUint8Array(subjectsChartImage),
             transformation: { width: 440, height: 272 }
           })

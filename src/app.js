@@ -27,6 +27,7 @@ function setText(id, value) {
 function applyStaticTexts() {
   const t = getUiStrings(currentLocale);
   setText('brandEyebrow', t.brandEyebrow);
+  setText('siteTitle', t.siteTitle);
   setText('restartBtn', t.restart);
   setText('heroBadge', t.heroBadge);
   setText('heroTitle', t.heroTitle);
@@ -55,6 +56,7 @@ function applyStaticTexts() {
   setText('exportPdfBtn', t.exportDocx);
   setText('chartSubjectsTitle', t.chartSubjectsTitle);
   setText('chartTraitsTitle', t.chartTraitsTitle);
+  document.title = `${t.siteTitle} | ${t.brandEyebrow}`;
 }
 
 function rerenderActiveView() {
