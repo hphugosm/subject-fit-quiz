@@ -4,17 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Subject Fit Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Public+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Adaptive Recommendation Prototype</p>
-        <h1>Subject Fit Engine</h1>
-        <p class="subtitle">
-          Komplexní kostra pro doporučování povinně volitelných předmětů.
-        </p>
+      <div class="brand-row">
+        <div class="brand-dot" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow">Academic Path</p>
+          <h1>Subject Fit Engine</h1>
+        </div>
       </div>
       <button id="restartBtn" class="ghost">Restart</button>
     </header>
@@ -22,7 +25,11 @@
     <main class="layout">
       <section class="panel main-panel">
         <div id="introView" class="view active">
-          <h2>Co tahle kostra umí</h2>
+          <p class="hero-tag">Průvodce výběrem předmětů</p>
+          <h2>Najdi předměty, které ti sednou profilem i stylem práce.</h2>
+          <p class="subtitle">
+            Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.
+          </p>
           <ul class="feature-list">
             <li>24 dimenzí profilu</li>
             <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
@@ -31,7 +38,10 @@
             <li>penalizace rozporů a anti-fit faktorů</li>
             <li>confidence scoring a narativní vysvětlení</li>
           </ul>
-          <button id="startBtn" class="primary">Spustit quiz</button>
+          <div class="intro-cta-row">
+            <button id="startBtn" class="primary">Spustit quiz</button>
+            <p class="small-note">Zabere cca 5 minut</p>
+          </div>
         </div>
 
         <div id="quizView" class="view">
