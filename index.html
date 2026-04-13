@@ -10,125 +10,95 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-row">
-        <div class="brand-dot" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand-wrap">
+      <div class="brand-dot" aria-hidden="true"></div>
+      <div>
+        <p class="eyebrow">Academic Vanguard</p>
+        <h1>Subject Fit Engine</h1>
+      </div>
+    </div>
+    <button id="restartBtn" class="icon-btn" type="button">Restart</button>
+  </header>
+
+  <main class="app-shell">
+    <section id="introView" class="view active panel editorial-hero">
+      <p class="hero-badge">Průvodce výběrem předmětů</p>
+      <h2>Najdi předměty, které ti sednou profilem i stylem práce.</h2>
+      <p class="subtitle">Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
+      <ul class="feature-list">
+        <li>24 dimenzí profilu</li>
+        <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
+        <li>adaptivní výběr další otázky podle informační hodnoty</li>
+        <li>podsložky výsledku: interest, aptitude, motivation, work-style</li>
+        <li>penalizace rozporů a anti-fit faktorů</li>
+        <li>confidence scoring a narativní vysvětlení</li>
+      </ul>
+      <div class="cta-stack">
+        <button id="startBtn" class="primary" type="button">Začít quiz</button>
+        <p class="small-note">Zabere cca 5 minut</p>
+      </div>
+      <blockquote class="pull-quote">"Nejde o závazné rozhodnutí, ale o doporučení pro tvůj další rozvoj."</blockquote>
+    </section>
+
+    <section id="quizView" class="view panel quiz-frame">
+      <div class="quiz-header">
         <div>
-          <p class="eyebrow">Academic Path</p>
-          <h1>Subject Fit Engine</h1>
+          <p class="muted" id="questionMeta">Otázka 1</p>
+          <h2 id="questionTitle"></h2>
+          <p id="questionHint" class="hint"></p>
+        </div>
+        <div class="progress-box">
+          <span id="progressText"></span>
+          <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
         </div>
       </div>
-      <button id="restartBtn" class="ghost">Restart</button>
-    </header>
 
-    <main class="layout">
-      <section class="panel main-panel">
-        <div id="introView" class="view active">
-          <p class="hero-tag">Průvodce výběrem předmětů</p>
-          <h2>Najdi předměty, které ti sednou profilem i stylem práce.</h2>
-          <p class="subtitle">
-            Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.
-          </p>
-          <ul class="feature-list">
-            <li>24 dimenzí profilu</li>
-            <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
-            <li>adaptivní výběr další otázky podle informační hodnoty</li>
-            <li>podsložky výsledku: interest, aptitude, motivation, work-style</li>
-            <li>penalizace rozporů a anti-fit faktorů</li>
-            <li>confidence scoring a narativní vysvětlení</li>
-          </ul>
-          <div class="intro-cta-row">
-            <button id="startBtn" class="primary">Spustit quiz</button>
-            <p class="small-note">Zabere cca 5 minut</p>
-          </div>
+      <div id="questionBody"></div>
+    </section>
+
+    <section id="resultsView" class="view panel results-frame">
+      <div class="results-head">
+        <div>
+          <p class="eyebrow">Výsledek</p>
+          <h2>Tvoje nejsilnější doporučení</h2>
         </div>
+        <div class="mode-switch">
+          <label for="resultMode">Režim</label>
+          <select id="resultMode">
+            <option value="balanced">Balanced fit</option>
+            <option value="interest">Interest fit</option>
+            <option value="strength">Strength fit</option>
+            <option value="career">Career utility fit</option>
+          </select>
+        </div>
+      </div>
 
-          <header class="topbar">
-            <div class="brand-wrap">
-              <div class="brand-dot" aria-hidden="true"></div>
-              <div>
-                <p class="eyebrow">Academic Vanguard</p>
-                <h1>Subject Fit Engine</h1>
-              </div>
-            </div>
-            <button id="restartBtn" class="icon-btn">Restart</button>
-          </header>
+      <div id="topResults" class="results-grid"></div>
+      <div id="narrativeBlock" class="nested"></div>
+      <div class="two-col">
+        <div id="clusterBlock" class="nested"></div>
+        <div id="conflictBlock" class="nested"></div>
+      </div>
+      <div class="two-col">
+        <div id="profileBlock" class="nested"></div>
+        <div id="whyNotBlock" class="nested"></div>
+      </div>
+    </section>
 
-          <main class="app-shell">
-            <section id="introView" class="view active panel editorial-hero">
-              <p class="hero-badge">Průvodce výběrem předmětů</p>
-              <h2>Najdi předměty, které ti sednou profilem i stylem práce.</h2>
-              <p class="subtitle">Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
-              <ul class="feature-list">
-                <li>24 dimenzí profilu</li>
-                <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
-                <li>adaptivní výběr další otázky podle informační hodnoty</li>
-                <li>podsložky výsledku: interest, aptitude, motivation, work-style</li>
-                <li>penalizace rozporů a anti-fit faktorů</li>
-                <li>confidence scoring a narativní vysvětlení</li>
-              </ul>
-              <div class="cta-stack">
-                <button id="startBtn" class="primary">Začít quiz</button>
-                <p class="small-note">Zabere cca 5 minut</p>
-              </div>
-              <blockquote class="pull-quote">"Nejde o závazné rozhodnutí, ale o doporučení pro tvůj další rozvoj."</blockquote>
-            </section>
+    <aside class="panel side-panel">
+      <h3>Debug / diagnostika</h3>
+      <div id="debugPanel"></div>
+    </aside>
+  </main>
 
-            <section id="quizView" class="view panel quiz-frame">
-              <div class="quiz-header">
-                <div>
-                  <p class="muted" id="questionMeta">Otázka 1</p>
-                  <h2 id="questionTitle"></h2>
-                  <p id="questionHint" class="hint"></p>
-                </div>
-                <div class="progress-box">
-                  <span id="progressText"></span>
-                  <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
-                </div>
-              </div>
+  <footer class="footer-shell">
+    <div class="controls">
+      <button id="backBtn" class="ghost" type="button">Zpět</button>
+      <button id="nextBtn" class="primary" type="button">Pokračovat</button>
+    </div>
+  </footer>
 
-              <div id="questionBody"></div>
-            </section>
-
-            <section id="resultsView" class="view panel results-frame">
-              <div class="results-head">
-                <div>
-                  <p class="eyebrow">Výsledek</p>
-                  <h2>Tvoje nejsilnější doporučení</h2>
-                </div>
-                <div class="mode-switch">
-                  <label for="resultMode">Režim</label>
-                  <select id="resultMode">
-                    <option value="balanced">Balanced fit</option>
-                    <option value="interest">Interest fit</option>
-                    <option value="strength">Strength fit</option>
-                    <option value="career">Career utility fit</option>
-                  </select>
-                </div>
-              </div>
-
-              <div id="topResults" class="results-grid"></div>
-              <div id="narrativeBlock" class="panel nested"></div>
-              <div class="two-col">
-                <div id="clusterBlock" class="panel nested"></div>
-                <div id="conflictBlock" class="panel nested"></div>
-              </div>
-              <div class="two-col">
-                <div id="profileBlock" class="panel nested"></div>
-                <div id="whyNotBlock" class="panel nested"></div>
-              </div>
-            </section>
-
-            <aside class="panel side-panel">
-              <h3>Debug / diagnostika</h3>
-              <div id="debugPanel"></div>
-            </aside>
-          </main>
-
-          <footer class="footer-shell">
-            <div class="controls">
-              <button id="backBtn" class="ghost">Zpět</button>
-              <button id="nextBtn" class="primary">Pokračovat</button>
-            </div>
-          </footer>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
