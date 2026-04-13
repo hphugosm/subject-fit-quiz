@@ -41,6 +41,32 @@ input {
   backdrop-filter: blur(14px);
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-select {
+  border: 0;
+  border-radius: 10px;
+  background: #ece7e7;
+  padding: 10px 12px;
+  color: #4f3d3f;
+  font-weight: 700;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 .brand-wrap {
   display: flex;
   align-items: center;

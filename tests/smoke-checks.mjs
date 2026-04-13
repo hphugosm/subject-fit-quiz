@@ -11,6 +11,7 @@ function checkDomHooks() {
   const requiredIds = [
     'startBtn',
     'restartBtn',
+    'languageSelect',
     'nextBtn',
     'backBtn',
     'introView',

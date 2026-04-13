@@ -6,8 +6,9 @@ export function setActiveView(viewId) {
   document.body.dataset.activeView = viewId;
 }
 
-export function renderQuestion(question, state, index, total) {
-  document.getElementById('questionMeta').textContent = `Otázka ${index}/${total}`;
+export function renderQuestion(question, state, index, total, ui = {}) {
+  const questionPrefix = ui.questionPrefix || 'Otazka';
+  document.getElementById('questionMeta').textContent = `${questionPrefix} ${index}/${total}`;
   document.getElementById('questionTitle').textContent = question.prompt;
   document.getElementById('questionHint').textContent = question.hint || '';
   document.getElementById('progressText').textContent = `${Math.round((index - 1) / total * 100)} %`;
@@ -146,7 +147,23 @@ export function collectQuestionAnswer(question) {
   return null;
 }
 
-export function renderResults({ rankedSubjects, narrative, clusters, whyNot, state, mode }) {
+export function renderResults({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {} }) {
+  const t = {
+    interpretationLabel: ui.interpretationLabel || 'Interpretace',
+    clustersTitle: ui.clustersTitle || 'Silne clustery',
+    conflictTitle: ui.conflictTitle || 'Konflikty a jistota',
+    noContradictions: ui.noContradictions || 'Bez vyraznych rozporu.',
+    confidenceSignals: ui.confidenceSignals || 'Confidence signaly',
+    noSignals: ui.noSignals || 'zadne',
+    profileTitle: ui.profileTitle || 'Dominantni profil',
+    whyNotTitle: ui.whyNotTitle || 'Proc ne jine smery',
+    metricInterest: ui.metricInterest || 'Interest fit',
+    metricAptitude: ui.metricAptitude || 'Aptitude fit',
+    metricWorkStyle: ui.metricWorkStyle || 'Work-style fit',
+    metricMotivation: ui.metricMotivation || 'Motivation fit',
+    confidenceLabel: ui.confidenceLabel || 'Confidence'
+  };
+
   const topResults = document.getElementById('topResults');
   topResults.innerHTML = '';
   rankedSubjects.slice(0, 5).forEach((subject, idx) => {
@@ -156,51 +173,57 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
       <p class="eyebrow">#${idx + 1} · ${subject.cluster}</p>
       <h3>${subject.name}</h3>
       <div class="score">${subject.scores.final}</div>
-      <p class="muted">Confidence: ${subject.confidence}</p>
+      <p class="muted">${t.confidenceLabel}: ${subject.confidence}</p>
       <table class="metric-table">
-        <tr><td>Interest fit</td><td>${subject.scores.interestFit}</td></tr>
-        <tr><td>Aptitude fit</td><td>${subject.scores.aptitudeFit}</td></tr>
-        <tr><td>Work-style fit</td><td>${subject.scores.workStyleFit}</td></tr>
-        <tr><td>Motivation fit</td><td>${subject.scores.motivationFit}</td></tr>
+        <tr><td>${t.metricInterest}</td><td>${subject.scores.interestFit}</td></tr>
+        <tr><td>${t.metricAptitude}</td><td>${subject.scores.aptitudeFit}</td></tr>
+        <tr><td>${t.metricWorkStyle}</td><td>${subject.scores.workStyleFit}</td></tr>
+        <tr><td>${t.metricMotivation}</td><td>${subject.scores.motivationFit}</td></tr>
       </table>
     `;
     topResults.appendChild(card);
   });
 
   document.getElementById('narrativeBlock').innerHTML = `
-    <p class="eyebrow">Interpretace · ${mode}</p>
+    <p class="eyebrow">${t.interpretationLabel} · ${mode}</p>
     <h3>${narrative.title}</h3>
     ${narrative.paragraphs.map((p) => `<p>${p}</p>`).join('')}
   `;
 
   document.getElementById('clusterBlock').innerHTML = `
-    <h3>Silné clustery</h3>
+    <h3>${t.clustersTitle}</h3>
     ${clusters.map((c) => `<p><strong>${c.cluster}</strong><br>${c.items.join(', ')}</p>`).join('')}
   `;
 
   document.getElementById('conflictBlock').innerHTML = `
-    <h3>Konflikty a jistota</h3>
+    <h3>${t.conflictTitle}</h3>
     ${state.contradictions.length
       ? `<ul class="simple-list">${state.contradictions.map((c) => `<li class="warning">${c.label}</li>`).join('')}</ul>`
-      : '<p>Bez výrazných rozporů.</p>'}
-    <p class="muted">Confidence signály: ${state.confidenceSignals.length ? state.confidenceSignals.map((n) => Math.round(n * 100)).join(', ') : 'žádné'}</p>
+      : `<p>${t.noContradictions}</p>`}
+    <p class="muted">${t.confidenceSignals}: ${state.confidenceSignals.length ? state.confidenceSignals.map((n) => Math.round(n * 100)).join(', ') : t.noSignals}</p>
   `;
 
   const sortedTraits = Object.entries(state.traits).sort((a, b) => b[1] - a[1]).slice(0, 8);
   document.getElementById('profileBlock').innerHTML = `
-    <h3>Dominantní profil</h3>
+    <h3>${t.profileTitle}</h3>
     <ul class="simple-list">
       ${sortedTraits.map(([k, v]) => `<li>${TRAIT_LABELS[k] || k}: ${Math.round(v * 100)}</li>`).join('')}
     </ul>
   `;
 
   document.getElementById('whyNotBlock').innerHTML = `
-    <h3>Proč ne jiné směry</h3>
+    <h3>${t.whyNotTitle}</h3>
     ${whyNot.map((item) => `<p><strong>${item.name}</strong><br>${item.whyNot}</p>`).join('')}
   `;
 }
 
-export function renderDebug(state, rankedSubjects) {
+export function renderDebug(state, rankedSubjects, ui = {}) {
+  const t = {
+    debugAnswered: ui.debugAnswered || 'Odpovezeno',
+    debugTopTraits: ui.debugTopTraits || 'Top traits',
+    debugTopRanking: ui.debugTopRanking || 'Top ranking'
+  };
+
   const debug = document.getElementById('debugPanel');
   const traits = Object.entries(state.traits)
     .sort((a, b) => b[1] - a[1])
@@ -210,15 +233,15 @@ export function renderDebug(state, rankedSubjects) {
 
   debug.innerHTML = `
     <div class="debug-block">
-      <strong>Odpovězeno</strong>
+      <strong>${t.debugAnswered}</strong>
       <p class="mono">${state.selectedQuestionIds.join(', ') || '-'}</p>
     </div>
     <div class="debug-block">
-      <strong>Top traits</strong>
+      <strong>${t.debugTopTraits}</strong>
       <ul class="simple-list mono">${traits}</ul>
     </div>
     <div class="debug-block">
-      <strong>Top ranking</strong>
+      <strong>${t.debugTopRanking}</strong>
       <ol class="simple-list mono">
         ${rankedSubjects.slice(0, 5).map((s) => `<li>${s.name}: ${s.scores.final}</li>`).join('')}
       </ol>

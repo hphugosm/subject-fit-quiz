@@ -14,31 +14,38 @@
     <div class="brand-wrap">
       <div class="brand-dot" aria-hidden="true"></div>
       <div>
-        <p class="eyebrow">Academic Vanguard</p>
+        <p class="eyebrow" id="brandEyebrow">Academic Vanguard</p>
         <h1>Subject Fit Engine</h1>
       </div>
     </div>
-    <button id="restartBtn" class="icon-btn" type="button">Restart</button>
+    <div class="topbar-actions">
+      <label class="sr-only" for="languageSelect">Language</label>
+      <select id="languageSelect" class="language-select" aria-label="Language">
+        <option value="cs">CZ</option>
+        <option value="en">EN</option>
+      </select>
+      <button id="restartBtn" class="icon-btn" type="button">Restart</button>
+    </div>
   </header>
 
   <main class="app-shell">
     <section id="introView" class="view active panel editorial-hero">
-      <p class="hero-badge">Průvodce výběrem předmětů</p>
-      <h2>Najdi předměty, které ti sednou profilem i stylem práce.</h2>
-      <p class="subtitle">Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
+      <p class="hero-badge" id="heroBadge">Průvodce výběrem předmětů</p>
+      <h2 id="heroTitle">Najdi předměty, které ti sednou profilem i stylem práce.</h2>
+      <p class="subtitle" id="heroSubtitle">Krátký adaptivní quiz vytáhne tvoje dominantní preference a doporučí nejlepší směry.</p>
       <ul class="feature-list">
-        <li>24 dimenzí profilu</li>
-        <li>více typů otázek: single, ranked, pairwise, aversion, confidence</li>
-        <li>adaptivní výběr další otázky podle informační hodnoty</li>
-        <li>podsložky výsledku: interest, aptitude, motivation, work-style</li>
-        <li>penalizace rozporů a anti-fit faktorů</li>
-        <li>confidence scoring a narativní vysvětlení</li>
+        <li id="feature1">24 dimenzí profilu</li>
+        <li id="feature2">více typů otázek: single, ranked, pairwise, aversion, confidence</li>
+        <li id="feature3">adaptivní výběr další otázky podle informační hodnoty</li>
+        <li id="feature4">podsložky výsledku: interest, aptitude, motivation, work-style</li>
+        <li id="feature5">penalizace rozporů a anti-fit faktorů</li>
+        <li id="feature6">confidence scoring a narativní vysvětlení</li>
       </ul>
       <div class="cta-stack">
         <button id="startBtn" class="primary" type="button">Začít quiz</button>
-        <p class="small-note">Zabere cca 5 minut</p>
+        <p class="small-note" id="durationNote">Zabere cca 5 minut</p>
       </div>
-      <blockquote class="pull-quote">"Nejde o závazné rozhodnutí, ale o doporučení pro tvůj další rozvoj."</blockquote>
+      <blockquote class="pull-quote" id="pullQuote">"Nejde o závazné rozhodnutí, ale o doporučení pro tvůj další rozvoj."</blockquote>
     </section>
 
     <section id="quizView" class="view panel quiz-frame">
@@ -60,16 +67,16 @@
     <section id="resultsView" class="view panel results-frame">
       <div class="results-head">
         <div>
-          <p class="eyebrow">Výsledek</p>
-          <h2>Tvoje nejsilnější doporučení</h2>
+          <p class="eyebrow" id="resultsEyebrow">Výsledek</p>
+          <h2 id="resultsTitle">Tvoje nejsilnější doporučení</h2>
         </div>
         <div class="mode-switch">
-          <label for="resultMode">Režim</label>
+          <label for="resultMode" id="resultModeLabel">Režim</label>
           <select id="resultMode">
-            <option value="balanced">Balanced fit</option>
-            <option value="interest">Interest fit</option>
-            <option value="strength">Strength fit</option>
-            <option value="career">Career utility fit</option>
+            <option value="balanced" id="modeBalanced">Balanced fit</option>
+            <option value="interest" id="modeInterest">Interest fit</option>
+            <option value="strength" id="modeStrength">Strength fit</option>
+            <option value="career" id="modeCareer">Career utility fit</option>
           </select>
         </div>
       </div>
@@ -87,7 +94,7 @@
     </section>
 
     <aside class="panel side-panel">
-      <h3>Debug / diagnostika</h3>
+      <h3 id="debugTitle">Debug / diagnostika</h3>
       <div id="debugPanel"></div>
     </aside>
   </main>
