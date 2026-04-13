@@ -1,33 +1,33 @@
 :root {
-  --bg: #0d1321;
-  --panel: #151d30;
-  --nested: #101827;
-  --text: #ecf2ff;
-  --muted: #9eb0cf;
-  --accent: #70a5ff;
-  --accent-2: #7ce0c3;
-  --border: #27324a;
-  --danger: #ff8a8a;
-  --warning: #f3c969;
+  --bg: #000000;
+  --panel: #0d0d0d;
+  --nested: #121212;
+  --text: #f5f5f5;
+  --muted: #b0b0b0;
+  --accent: #ffffff;
+  --accent-2: #d8d8d8;
+  --border: #2b2b2b;
+  --danger: #f5f5f5;
+  --warning: #d8d8d8;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  background: linear-gradient(180deg, #0d1321, #09101c);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000;
   color: var(--text);
 }
 button, select {
   font: inherit;
 }
 .app-shell {
-  max-width: 1400px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
 }
 .topbar, .quiz-header, .results-head, .controls, .two-col, .layout {
   display: flex;
-  gap: 16px;
+  gap: 14px;
 }
 .topbar, .quiz-header, .results-head, .controls {
   align-items: center;
@@ -37,22 +37,22 @@ button, select {
   align-items: flex-start;
 }
 .panel {
-  background: rgba(21, 29, 48, 0.95);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 14px 40px rgba(0,0,0,.22);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: none;
 }
 .nested {
   background: var(--nested);
   width: 100%;
 }
 .main-panel { flex: 1; }
-.side-panel { width: 340px; position: sticky; top: 24px; }
+.side-panel { width: 320px; position: sticky; top: 20px; }
 .view { display: none; }
 .view.active { display: block; }
 .eyebrow {
-  color: var(--accent-2);
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: .08em;
   font-size: .75rem;
@@ -63,14 +63,14 @@ button, select {
 }
 .feature-list, .simple-list { padding-left: 18px; }
 .primary, .ghost {
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 10px 16px;
   cursor: pointer;
   border: 1px solid var(--border);
 }
 .primary {
-  background: var(--accent);
-  color: #08111e;
+  background: #fff;
+  color: #000;
   border-color: transparent;
   font-weight: 700;
 }
@@ -84,13 +84,13 @@ button, select {
 .progress-track {
   height: 10px;
   border-radius: 999px;
-  background: #0a1020;
+  background: #171717;
   overflow: hidden;
 }
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: #fff;
 }
 .option-list, .ranked-list {
   display: grid;
@@ -99,14 +99,14 @@ button, select {
 }
 .option-card {
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 14px;
-  background: #101727;
+  background: #101010;
   cursor: pointer;
 }
 .option-card.selected {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: #fff;
+  box-shadow: inset 0 0 0 1px #fff;
 }
 .option-card strong { display: block; margin-bottom: 6px; }
 .ranked-item {
@@ -163,7 +163,7 @@ button, select {
   border-radius: 999px;
   padding: 4px 9px;
   font-size: .75rem;
-  color: var(--accent-2);
+  color: var(--text);
 }
 .metric-table {
   width: 100%;

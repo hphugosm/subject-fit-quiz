@@ -69,7 +69,9 @@ function normalizeTraits(traits) {
 }
 
 export function detectContradictions(traits) {
-  return CONTRADICTION_RULES.filter((rule) => rule.when(traits));
+  return CONTRADICTION_RULES
+    .filter((rule) => rule.when(traits))
+    .map(({ id, severity, label }) => ({ id, severity, label }));
 }
 
 function dot(user, weights) {
