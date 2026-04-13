@@ -1,5 +1,89 @@
 import { TRAIT_LABELS } from "../data/traits.js";
 
+let chartInstances = [];
+
+function destroyCharts() {
+  chartInstances.forEach((chart) => chart.destroy());
+  chartInstances = [];
+}
+
+function buildChartPalette(count) {
+  const palette = [
+    '#991136',
+    '#bb2e4c',
+    '#d04e69',
+    '#8d2b00',
+    '#3c6a00',
+    '#5c8f1b',
+    '#6f4f56',
+    '#8c7072'
+  ];
+  return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
+}
+
+function renderCharts(rankedSubjects, state, ui) {
+  destroyCharts();
+
+  if (typeof window.Chart === 'undefined') return;
+
+  const subjectsCanvas = document.getElementById('subjectsPieChart');
+  const traitsCanvas = document.getElementById('traitsPieChart');
+  if (!subjectsCanvas || !traitsCanvas) return;
+
+  const topSubjects = rankedSubjects.slice(0, 5);
+  const topTraits = Object.entries(state.traits)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+
+  const subjectChart = new window.Chart(subjectsCanvas, {
+    type: 'pie',
+    data: {
+      labels: topSubjects.map((s) => s.name),
+      datasets: [
+        {
+          data: topSubjects.map((s) => Number(s.scores.final)),
+          backgroundColor: buildChartPalette(topSubjects.length)
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.label}: ${context.raw}`
+          }
+        }
+      }
+    }
+  });
+
+  const traitChart = new window.Chart(traitsCanvas, {
+    type: 'doughnut',
+    data: {
+      labels: topTraits.map(([key]) => TRAIT_LABELS[key] || key),
+      datasets: [
+        {
+          data: topTraits.map(([, value]) => Math.round(value * 100)),
+          backgroundColor: buildChartPalette(topTraits.length)
+        }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.label}: ${context.raw}`
+          }
+        }
+      }
+    }
+  });
+
+  chartInstances.push(subjectChart, traitChart);
+}
+
 export function setActiveView(viewId) {
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   document.getElementById(viewId).classList.add('active');
@@ -161,8 +245,15 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
     metricAptitude: ui.metricAptitude || 'Aptitude fit',
     metricWorkStyle: ui.metricWorkStyle || 'Work-style fit',
     metricMotivation: ui.metricMotivation || 'Motivation fit',
-    confidenceLabel: ui.confidenceLabel || 'Confidence'
+    confidenceLabel: ui.confidenceLabel || 'Confidence',
+    chartSubjectsTitle: ui.chartSubjectsTitle || 'Rozložení Top 5',
+    chartTraitsTitle: ui.chartTraitsTitle || 'Rozložení hlavních rysů'
   };
+
+  const subjectsChartTitle = document.getElementById('chartSubjectsTitle');
+  if (subjectsChartTitle) subjectsChartTitle.textContent = t.chartSubjectsTitle;
+  const traitsChartTitle = document.getElementById('chartTraitsTitle');
+  if (traitsChartTitle) traitsChartTitle.textContent = t.chartTraitsTitle;
 
   const topResults = document.getElementById('topResults');
   topResults.innerHTML = '';
@@ -215,6 +306,95 @@ export function renderResults({ rankedSubjects, narrative, clusters, whyNot, sta
     <h3>${t.whyNotTitle}</h3>
     ${whyNot.map((item) => `<p><strong>${item.name}</strong><br>${item.whyNot}</p>`).join('')}
   `;
+
+  renderCharts(rankedSubjects, state, t);
+}
+
+export async function exportResultsToPdf({ rankedSubjects, narrative, clusters, whyNot, state, mode, ui = {} }) {
+  if (!window.jspdf?.jsPDF) {
+    alert('PDF knihovna není načtená.');
+    return;
+  }
+
+  const t = {
+    exportTitle: ui.exportTitle || 'Výsledky quizu',
+    interpretationLabel: ui.interpretationLabel || 'Vysvětlení',
+    clustersTitle: ui.clustersTitle || 'Silné skupiny',
+    conflictTitle: ui.conflictTitle || 'Rozpory a jistota',
+    whyNotTitle: ui.whyNotTitle || 'Proč ne jiné směry',
+    confidenceLabel: ui.confidenceLabel || 'Míra jistoty'
+  };
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+  const subjectsChartCanvas = document.getElementById('subjectsPieChart');
+  const traitsChartCanvas = document.getElementById('traitsPieChart');
+  const subjectsChartImage = subjectsChartCanvas?.toDataURL('image/png');
+  const traitsChartImage = traitsChartCanvas?.toDataURL('image/png');
+
+  doc.setFillColor(245, 243, 243);
+  doc.rect(24, 24, 548, 794, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text(t.exportTitle, 44, 60);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${t.interpretationLabel}: ${mode}`, 44, 78);
+
+  const top = rankedSubjects.slice(0, 5);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Top 5', 44, 110);
+  doc.setFont('helvetica', 'normal');
+  top.forEach((subject, index) => {
+    doc.text(`${index + 1}. ${subject.name} (${subject.scores.final})`, 44, 130 + index * 16);
+  });
+
+  if (subjectsChartImage) doc.addImage(subjectsChartImage, 'PNG', 320, 98, 220, 180);
+  if (traitsChartImage) doc.addImage(traitsChartImage, 'PNG', 320, 292, 220, 180);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.interpretationLabel, 44, 240);
+  doc.setFont('helvetica', 'normal');
+  doc.text(doc.splitTextToSize(narrative.title, 250), 44, 258);
+  const paragraphText = narrative.paragraphs.join(' ');
+  doc.text(doc.splitTextToSize(paragraphText, 250), 44, 288);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.clustersTitle, 44, 500);
+  doc.setFont('helvetica', 'normal');
+  clusters.forEach((cluster, index) => {
+    doc.text(`${cluster.cluster}: ${cluster.items.join(', ')}`, 44, 520 + index * 16);
+  });
+
+  doc.addPage();
+  doc.setFillColor(245, 243, 243);
+  doc.rect(24, 24, 548, 794, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text(t.conflictTitle, 44, 60);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+
+  if (state.contradictions.length) {
+    state.contradictions.forEach((item, index) => {
+      doc.text(`- ${item.label}`, 44, 84 + index * 16);
+    });
+  } else {
+    doc.text('Bez výrazných rozporů.', 44, 84);
+  }
+
+  doc.text(`${t.confidenceLabel}: ${state.confidenceSignals.length ? state.confidenceSignals.map((n) => Math.round(n * 100)).join(', ') : 'žádné'}`, 44, 140);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(t.whyNotTitle, 44, 184);
+  doc.setFont('helvetica', 'normal');
+  whyNot.forEach((item, index) => {
+    doc.text(doc.splitTextToSize(`${item.name}: ${item.whyNot}`, 500), 44, 206 + index * 54);
+  });
+
+  doc.save('subject-fit-results.pdf');
 }
 
 export function renderDebug(state, rankedSubjects, ui = {}) {

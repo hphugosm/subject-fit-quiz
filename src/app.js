@@ -1,7 +1,7 @@
 import { getQuestionPlan } from './engine/adaptive.js';
 import { buildClusters, buildNarrative, buildWhyNot } from './engine/narrative.js';
 import { applyAnswer, computeConfidence, createInitialState, scoreSubjects } from './engine/scoring.js';
-import { collectQuestionAnswer, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
+import { collectQuestionAnswer, exportResultsToPdf, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
 import { getUiStrings, localizeQuestion } from './i18n/translations.js';
 
 let state = createInitialState();
@@ -11,6 +11,7 @@ const MAX_QUESTIONS = 12;
 let currentMode = 'balanced';
 let currentLocale = 'cs';
 const snapshots = [];
+let lastResultsPayload = null;
 
 function setText(id, value) {
   const node = document.getElementById(id);
@@ -38,6 +39,9 @@ function applyStaticTexts() {
   setText('debugTitle', t.debugTitle);
   setText('backBtn', t.back);
   setText('nextBtn', t.next);
+  setText('exportPdfBtn', t.exportPdf);
+  setText('chartSubjectsTitle', t.chartSubjectsTitle);
+  setText('chartTraitsTitle', t.chartTraitsTitle);
 }
 
 function rerenderActiveView() {
@@ -108,7 +112,9 @@ function updateResults() {
   const narrative = buildNarrative(state, rankedSubjects);
   const clusters = buildClusters(rankedSubjects);
   const whyNot = buildWhyNot(rankedSubjects);
-  renderResults({ rankedSubjects, narrative, clusters, whyNot, state, mode: currentMode, ui: getUiStrings(currentLocale) });
+  const ui = getUiStrings(currentLocale);
+  lastResultsPayload = { rankedSubjects, narrative, clusters, whyNot, state, mode: currentMode, ui };
+  renderResults(lastResultsPayload);
   renderDebug(state, rankedSubjects, getUiStrings(currentLocale));
 }
 
@@ -130,6 +136,10 @@ document.getElementById('restartBtn').addEventListener('click', () => {
 document.getElementById('resultMode').addEventListener('change', (e) => {
   currentMode = e.target.value;
   updateResults();
+});
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  if (!lastResultsPayload) return;
+  exportResultsToPdf(lastResultsPayload);
 });
 document.getElementById('languageSelect').addEventListener('change', (e) => {
   currentLocale = e.target.value;
