@@ -3,7 +3,7 @@ import { buildClusters, buildWhyNot } from './engine/narrative.js';
 import { QUESTIONS } from './data/questions.js';
 import { applyAnswer, computeConfidence, createInitialState, scoreSubjects } from './engine/scoring.js';
 import { collectQuestionAnswer, exportResultsToDocx, renderDebug, renderQuestion, renderResults, setActiveView } from './ui/render.js';
-import { getUiStrings, localizeQuestion } from './i18n/translations.js';
+import { getUiStrings, loadContentOverridesFromMarkdown, localizeQuestion } from './i18n/translations.js';
 import { buildLocalizedNarrative, localizeContradictions, localizeRankedSubjects } from './i18n/results-localization.js';
 
 let state = createInitialState();
@@ -237,7 +237,12 @@ document.getElementById('languageSelect').addEventListener('change', (e) => {
   rerenderActiveView();
 });
 
-applyStaticTexts();
-renderLiveDebug();
-setActiveView('introView');
-console.log('Subject Fit Engine loaded', computeConfidence(state));
+async function bootstrap() {
+  await loadContentOverridesFromMarkdown('./TRANSLATION_TODO-4.md');
+  applyStaticTexts();
+  renderLiveDebug();
+  setActiveView('introView');
+  console.log('Subject Fit Engine loaded', computeConfidence(state));
+}
+
+bootstrap();

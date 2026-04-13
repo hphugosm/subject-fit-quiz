@@ -134,6 +134,9 @@ const EN = {
 
 export const UI_STRINGS = { cs: CS, en: EN };
 
+let markdownUiOverrides = null;
+let markdownQuestionOverrides = null;
+
 const CS_QUESTION_TEXT = {
   q1: {
     prompt: 'Co tě na dlouhodobém projektu přitahuje nejvíc?',
@@ -377,13 +380,164 @@ const QUESTION_TEXT = {
   en: EN_QUESTION_TEXT
 };
 
+function parseUiTableFromMarkdown(markdown) {
+  const lines = markdown.split('\n');
+  const ui = { cs: {}, en: {} };
+  let inUiSection = false;
+  let inTable = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (line === '## UI') {
+      inUiSection = true;
+      continue;
+    }
+    if (inUiSection && line.startsWith('## ')) break;
+    if (!inUiSection) continue;
+
+    if (line.startsWith('| Klic |')) {
+      inTable = true;
+      continue;
+    }
+    if (!inTable || line.startsWith('|---')) continue;
+    if (!line.startsWith('|')) continue;
+
+    const cells = line
+      .split('|')
+      .slice(1, -1)
+      .map((cell) => cell.trim());
+
+    if (cells.length < 3) continue;
+
+    const key = cells[0];
+    const csValue = cells[1];
+    const enValue = cells[2];
+
+    const featureMatch = key.match(/^features\[(\d+)]$/);
+    if (featureMatch) {
+      const index = Number(featureMatch[1]);
+      if (!Number.isNaN(index)) {
+        if (!Array.isArray(ui.cs.features)) ui.cs.features = [];
+        ui.cs.features[index] = csValue;
+        if (enValue) {
+          if (!Array.isArray(ui.en.features)) ui.en.features = [];
+          ui.en.features[index] = enValue;
+        }
+      }
+      continue;
+    }
+
+    if (csValue) ui.cs[key] = csValue;
+    if (enValue) ui.en[key] = enValue;
+  }
+
+  return ui;
+}
+
+function parseQuestionsFromMarkdown(markdown) {
+  const lines = markdown.split('\n');
+  const questions = { cs: {}, en: {} };
+  let currentQuestionId = null;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const qHeader = line.match(/^###\s+(q\d+)$/i);
+    if (qHeader) {
+      currentQuestionId = qHeader[1].toLowerCase();
+      questions.cs[currentQuestionId] = questions.cs[currentQuestionId] || {};
+      questions.en[currentQuestionId] = questions.en[currentQuestionId] || {};
+      continue;
+    }
+    if (!currentQuestionId) continue;
+
+    const promptCs = line.match(/^-\s*prompt_cs:\s*(.+)$/i);
+    if (promptCs) {
+      questions.cs[currentQuestionId].prompt = promptCs[1].trim();
+      continue;
+    }
+    const promptEn = line.match(/^-\s*prompt_en:\s*(.+)$/i);
+    if (promptEn) {
+      questions.en[currentQuestionId].prompt = promptEn[1].trim();
+      continue;
+    }
+
+    const optionCs = line.match(/^-\s*([a-d])_cs:\s*(.+)$/i);
+    if (optionCs) {
+      const optionId = optionCs[1].toLowerCase();
+      const text = optionCs[2].trim();
+      questions.cs[currentQuestionId].options = questions.cs[currentQuestionId].options || {};
+      questions.cs[currentQuestionId].options[optionId] = text;
+      continue;
+    }
+    const optionEn = line.match(/^-\s*([a-d])_en:\s*(.+)$/i);
+    if (optionEn) {
+      const optionId = optionEn[1].toLowerCase();
+      const text = optionEn[2].trim();
+      questions.en[currentQuestionId].options = questions.en[currentQuestionId].options || {};
+      questions.en[currentQuestionId].options[optionId] = text;
+      continue;
+    }
+  }
+
+  return questions;
+}
+
+function deepMerge(base, incoming) {
+  const merged = { ...base };
+  for (const [key, value] of Object.entries(incoming || {})) {
+    if (Array.isArray(value) && Array.isArray(base[key])) {
+      const next = base[key].slice();
+      value.forEach((item, index) => {
+        if (typeof item === 'string' && item) next[index] = item;
+      });
+      merged[key] = next;
+      continue;
+    }
+    if (value && typeof value === 'object' && !Array.isArray(value) && base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])) {
+      merged[key] = deepMerge(base[key], value);
+      continue;
+    }
+    if (typeof value === 'string' && value.length > 0) {
+      merged[key] = value;
+    }
+  }
+  return merged;
+}
+
+export async function loadContentOverridesFromMarkdown(path = './TRANSLATION_TODO-4.md') {
+  try {
+    const response = await fetch(path, { cache: 'no-store' });
+    if (!response.ok) return false;
+    const markdown = await response.text();
+
+    const uiParsed = parseUiTableFromMarkdown(markdown);
+    const questionsParsed = parseQuestionsFromMarkdown(markdown);
+
+    markdownUiOverrides = {
+      cs: deepMerge(CS, uiParsed.cs || {}),
+      en: deepMerge(EN, uiParsed.en || {})
+    };
+
+    markdownQuestionOverrides = {
+      cs: deepMerge(CS_QUESTION_TEXT, questionsParsed.cs || {}),
+      en: deepMerge(EN_QUESTION_TEXT, questionsParsed.en || {})
+    };
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getUiStrings(locale) {
-  return UI_STRINGS[locale] || UI_STRINGS.cs;
+  const source = markdownUiOverrides || UI_STRINGS;
+  return source[locale] || source.cs;
 }
 
 export function localizeQuestion(question, locale) {
-  const lang = QUESTION_TEXT[locale] ? locale : 'cs';
-  const translated = QUESTION_TEXT[lang][question.id];
+  const source = markdownQuestionOverrides || QUESTION_TEXT;
+  const lang = source[locale] ? locale : 'cs';
+  const translated = source[lang][question.id];
   if (!translated) return question;
 
   const localized = structuredClone(question);
