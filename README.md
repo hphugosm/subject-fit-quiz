@@ -28,6 +28,16 @@ python3 -m http.server 8080
 
 Pak otevři lokální adresu v prohlížeči.
 
+## Rychlý smoke check
+
+Po změnách layoutu nebo logiky můžeš rychle ověřit integritu:
+
+```bash
+node tests/smoke-checks.mjs
+```
+
+Skript kontroluje unikátnost klíčových DOM ID a základní průchod 12 otázkami bez opakování.
+
 ## Struktura
 
 - `src/data/traits.js` – definice dimenzí
