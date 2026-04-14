@@ -86,14 +86,15 @@ export function scoreSubjects(state, modeKey = "balanced") {
   const mode = SCORING_MODES[modeKey] ?? SCORING_MODES.balanced;
   const confidence = computeConfidence(state);
   const contradictionPenalty = state.contradictions.reduce((sum, item) => sum + item.severity, 0);
+  const signalTraits = toSignalTraits(state.traits);
 
-  return SUBJECTS.map((subject) => {
-    const interestFit = dot(state.traits, subject.ideal);
-    const aptitudeFit = dot(state.traits, mapAptitude(subject.ideal));
-    const workStyleFit = dot(state.traits, mapWorkStyle(subject.ideal));
-    const motivationFit = dot(state.traits, mapMotivation(subject.ideal));
-    const assessmentFit = dot(state.traits, mapAssessment(subject.ideal));
-    const antiPenalty = antiFitPenalty(state.traits, subject.antiFit || {});
+  const preScored = SUBJECTS.map((subject) => {
+    const interestFit = dot(signalTraits, subject.ideal);
+    const aptitudeFit = dot(signalTraits, mapAptitude(subject.ideal));
+    const workStyleFit = dot(signalTraits, mapWorkStyle(subject.ideal));
+    const motivationFit = dot(signalTraits, mapMotivation(subject.ideal));
+    const assessmentFit = dot(signalTraits, mapAssessment(subject.ideal));
+    const antiPenalty = antiFitPenalty(signalTraits, subject.antiFit || {});
 
     const raw =
       interestFit * mode.interest +
@@ -104,17 +105,35 @@ export function scoreSubjects(state, modeKey = "balanced") {
       antiPenalty -
       contradictionPenalty;
 
-    const scaled = Math.max(0, Math.min(100, raw * 28 * confidence.factor));
+    return {
+      subject,
+      interestFit,
+      aptitudeFit,
+      workStyleFit,
+      motivationFit,
+      assessmentFit,
+      antiPenalty,
+      raw
+    };
+  });
+
+  const clusterAdjustment = buildClusterAdjustment(preScored);
+
+  return preScored.map((entry) => {
+    const clusterFairnessPenalty = clusterAdjustment.get(entry.subject.cluster) ?? 0;
+    const fairRaw = entry.raw * (1 - clusterFairnessPenalty);
+    const scaled = Math.max(0, Math.min(100, fairRaw * 28 * confidence.factor));
 
     return {
-      ...subject,
+      ...entry.subject,
       scores: {
-        interestFit: round(interestFit * 100 / 6),
-        aptitudeFit: round(aptitudeFit * 100 / 6),
-        workStyleFit: round(workStyleFit * 100 / 5),
-        motivationFit: round(motivationFit * 100 / 5),
-        assessmentFit: round(assessmentFit * 100 / 4),
-        antiPenalty: round(antiPenalty * 10),
+        interestFit: round(entry.interestFit * 100 / 6),
+        aptitudeFit: round(entry.aptitudeFit * 100 / 6),
+        workStyleFit: round(entry.workStyleFit * 100 / 5),
+        motivationFit: round(entry.motivationFit * 100 / 5),
+        assessmentFit: round(entry.assessmentFit * 100 / 4),
+        antiPenalty: round(entry.antiPenalty * 10),
+        clusterFairnessPenalty: round(clusterFairnessPenalty * 100),
         contradictionPenalty: round(contradictionPenalty * 100),
         final: round(scaled)
       },
@@ -139,6 +158,43 @@ function projectWeights(ideal, keys) {
   return Object.fromEntries(Object.entries(ideal).filter(([k]) => keys.includes(k)));
 }
 function round(n) { return Math.round(n * 10) / 10; }
+
+function toSignalTraits(traits) {
+  return Object.fromEntries(
+    Object.entries(traits).map(([key, value]) => {
+      // Values around 0.5 are neutral due to sigmoid normalization.
+      const signal = Math.max(0, (value - 0.5) * 2);
+      return [key, Number(signal.toFixed(4))];
+    })
+  );
+}
+
+function buildClusterAdjustment(preScored) {
+  const buckets = new Map();
+  preScored.forEach((entry) => {
+    const key = entry.subject.cluster;
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(entry.raw);
+  });
+
+  const clusterAverages = Array.from(buckets.entries()).map(([cluster, values]) => ({
+    cluster,
+    avg: values.reduce((sum, value) => sum + value, 0) / values.length
+  }));
+
+  const globalAverage = clusterAverages.length
+    ? clusterAverages.reduce((sum, item) => sum + item.avg, 0) / clusterAverages.length
+    : 0;
+
+  const adjustments = new Map();
+  clusterAverages.forEach(({ cluster, avg }) => {
+    const dominance = Math.max(0, avg - globalAverage * 1.14);
+    const penalty = Math.min(0.14, dominance * 0.34);
+    adjustments.set(cluster, Number(penalty.toFixed(4)));
+  });
+
+  return adjustments;
+}
 
 export function computeConfidence(state) {
   const avgSignal = state.confidenceSignals.length

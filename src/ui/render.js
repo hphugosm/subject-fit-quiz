@@ -578,7 +578,7 @@ export async function exportResultsToDocx({ rankedSubjects, narrative, clusters,
   window.saveAs(blob, `${fileBase}.docx`);
 }
 
-export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs') {
+export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs', coverageAuditLines = []) {
   const t = {
     debugAnswered: ui.debugAnswered || 'Odpovezeno',
     debugTopTraits: ui.debugTopTraits || 'Top traits',
@@ -591,6 +591,10 @@ export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs') {
     .slice(0, 12)
     .map(([k, v]) => `<li>${getTraitLabel(k, locale)}: ${Math.round(v * 100)}</li>`)
     .join('');
+
+  const coverage = coverageAuditLines.length
+    ? `<div class="debug-block"><strong>Coverage audit</strong><ul class="simple-list mono">${coverageAuditLines.map((line) => `<li>${line}</li>`).join('')}</ul></div>`
+    : '';
 
   debug.innerHTML = `
     <div class="debug-block">
@@ -607,5 +611,6 @@ export function renderDebug(state, rankedSubjects, ui = {}, locale = 'cs') {
         ${rankedSubjects.slice(0, 5).map((s) => `<li>${s.name}: ${s.scores.final}</li>`).join('')}
       </ol>
     </div>
+    ${coverage}
   `;
 }

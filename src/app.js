@@ -1,4 +1,5 @@
 import { getQuestionPlan } from './engine/adaptive.js';
+import { buildCoverageAuditSummaryLines } from './engine/coverage-audit.js';
 import { buildClusters, buildWhyNot } from './engine/narrative.js';
 import { QUESTIONS } from './data/questions.js';
 import { applyAnswer, computeConfidence, createInitialState, scoreSubjects } from './engine/scoring.js';
@@ -18,6 +19,7 @@ let currentReportStyle = 'detailed';
 let currentExportLanguage = 'bilingual';
 const snapshots = [];
 let lastResultsPayload = null;
+const coverageAuditLines = buildCoverageAuditSummaryLines();
 
 function setText(id, value) {
   const node = document.getElementById(id);
@@ -193,7 +195,7 @@ function updateResults() {
     }
   };
   renderResults(lastResultsPayload);
-  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale);
+  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale, coverageAuditLines);
 }
 
 function renderLiveDebug() {
@@ -202,7 +204,7 @@ function renderLiveDebug() {
     ...state,
     contradictions: localizeContradictions(state.contradictions, currentLocale)
   };
-  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale);
+  renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale, coverageAuditLines);
 }
 
 document.getElementById('startBtn').addEventListener('click', start);

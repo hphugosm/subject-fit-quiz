@@ -5,8 +5,8 @@ export const SUBJECTS = [
     cluster: "Society / Culture",
     ideal: { cultural_curiosity: 0.95, people_orientation: 0.82, ambiguity_tolerance: 0.76, historical_interest: 0.55, theory_tolerance: 0.64, ethics_orientation: 0.5, text_orientation: 0.55 },
     antiFit: { structure_need: 0.35, financial_orientation: 0.25 },
-    explanations: ["sedí lidem, kteří chtějí chápat kulturu a rozdíly mezi lidmi", "má vyšší toleranci pro otevřenou interpretaci"],
-    whyNot: "Může ztrácet u lidí, kteří chtějí hlavně tvrdý praktický výstup nebo výrazně strukturované úlohy."
+    explanations: ["sedí lidem, kteří umí číst kulturní vzorce v chování lidí i institucí", "silná je tam, kde tě baví terén, kontext a práce s více vrstvami významu"],
+    whyNot: "Bývá níž, pokud tě dlouhodobě naplňuje hlavně formální modelování, číselná optimalizace nebo striktně technický provoz."
   },
   {
     id: "art_architecture",
@@ -23,8 +23,8 @@ export const SUBJECTS = [
     cluster: "Humanities / History",
     ideal: { historical_interest: 0.95, theory_tolerance: 0.72, text_orientation: 0.67, cultural_curiosity: 0.62, language_sensitivity: 0.36 },
     antiFit: { practical_impact: 0.3, financial_orientation: 0.28 },
-    explanations: ["sedí lidem s hlubším historickým a textovým zájmem"],
-    whyNot: "Často nesedí lidem, kteří chtějí bezprostřední aplikaci a měřitelný praktický dopad."
+    explanations: ["silný fit pro profily, které skládají minulost z pramenů, pojmů a souvislostí", "odměňuje přesnou textovou práci i cit pro historický kontext"],
+    whyNot: "Mívá slabší prioritu, pokud potřebuješ hlavně okamžitý operativní dopad a minimum dlouhé textové analýzy."
   },
   {
     id: "creative_writing",
@@ -68,8 +68,8 @@ export const SUBJECTS = [
     cluster: "Language / Analysis",
     ideal: { language_sensitivity: 0.97, text_orientation: 0.84, systematic_thinking: 0.46, theory_tolerance: 0.58, cultural_curiosity: 0.5 },
     antiFit: { financial_orientation: 0.12 },
-    explanations: ["spojuje jazykový cit s analytickou textovou prací"],
-    whyNot: "Často nesedí profilům, které chtějí minimum textu a víc přímé aplikace nebo řízení výsledku."
+    explanations: ["spojuje detailní jazykový cit s analytickou prací nad strukturou řeči", "vyhovuje, když tě baví hledat pravidelnosti v tom, jak jazyk skutečně funguje"],
+    whyNot: "Může klesat, pokud nechceš pracovat s jazykovým detailem a preferuješ převážně rychlá rozhodnutí bez textu."
   },
   {
     id: "world_literature",
@@ -77,8 +77,8 @@ export const SUBJECTS = [
     cluster: "Humanities / Language",
     ideal: { text_orientation: 0.97, cultural_curiosity: 0.82, ambiguity_tolerance: 0.72, language_sensitivity: 0.66, historical_interest: 0.38 },
     antiFit: { practical_impact: 0.34, structure_need: 0.26 },
-    explanations: ["hodně stojí na interpretaci textu a kulturním kontextu"],
-    whyNot: "Slábne tam, kde člověk potřebuje jasnou strukturu a hmatatelný výsledek."
+    explanations: ["silný fit pro dlouhodobé čtení textů v kulturním a historickém kontextu", "těží z citu pro nuance významu, hlasu autora a interpretační vrstvy"],
+    whyNot: "Mívá nižší prioritu, pokud tě dlouhodobě drží hlavně procesní optimalizace a minimální práce s textem."
   },
   {
     id: "law",
@@ -103,8 +103,8 @@ export const SUBJECTS = [
     name: "Lidské zdroje a řízení organizace",
     cluster: "People / Organization",
     ideal: { people_orientation: 0.9, organizational_drive: 0.78, presentation_energy: 0.6, argumentation: 0.42, ethics_orientation: 0.48 },
-    antiFit: { quant_reasoning: 0.06, systematical_thinking: 0.05 },
-    explanations: ["stojí víc na práci s lidmi a fungování organizace"],
+    antiFit: { quant_reasoning: 0.06, systematic_thinking: 0.05 },
+    explanations: ["stojí na práci s lidmi, motivací a nastavováním fungující organizační spolupráce"],
     whyNot: "Není ideální pro profil, který chce spíš systémy, technologie a méně sociálního vyjednávání."
   },
   {
@@ -113,8 +113,8 @@ export const SUBJECTS = [
     cluster: "Creative / Performance",
     ideal: { creative_expression: 0.94, aesthetic_sensitivity: 0.91, presentation_energy: 0.55, ambiguity_tolerance: 0.52 },
     antiFit: { practical_impact: 0.16, financial_orientation: 0.12 },
-    explanations: ["sedí lidem s výraznou estetickou a tvůrčí orientací"],
-    whyNot: "Klesá u profilů, které nehledají sebevyjádření nebo estetickou tvorbu jako hlavní osu."
+    explanations: ["sedí profilům s hudební představivostí, rytmickým citem a potřebou výrazu", "není to doplněk, ale plnohodnotná dráha pro práci s formou, pozorností a interpretací"],
+    whyNot: "Bývá níž u profilů, které dlouhodobě preferují hlavně procesní kontrolu, formální modely a minimální estetickou složku práce."
   },
   {
     id: "philosophy",
@@ -149,8 +149,8 @@ export const SUBJECTS = [
     cluster: "Mind / Analysis",
     ideal: { people_orientation: 0.76, systematic_thinking: 0.56, theory_tolerance: 0.62, ethics_orientation: 0.44, text_orientation: 0.46, quant_reasoning: 0.34 },
     antiFit: { financial_orientation: 0.08 },
-    explanations: ["spojení zájmu o člověka s určitou analytickou hloubkou"],
-    whyNot: "Slábne, pokud profil nechce ani lidi, ani interpretaci chování."
+    explanations: ["kombinuje práci s lidským chováním, hypotézami a analytickým ověřováním", "silný fit, pokud tě zajímá, jak mysl a prostředí formují rozhodování"],
+    whyNot: "Klesá, pokud nechceš systematicky sledovat chování lidí ani pracovat s interpretací dat a vzorců."
   },
   {
     id: "public_speaking",
@@ -176,8 +176,8 @@ export const SUBJECTS = [
     cluster: "Society / Culture",
     ideal: { people_orientation: 0.76, cultural_curiosity: 0.88, ambiguity_tolerance: 0.75, theory_tolerance: 0.65, text_orientation: 0.54 },
     antiFit: { practical_impact: 0.22, financial_orientation: 0.22 },
-    explanations: ["silný fit pro společenský a kulturní zájem"],
-    whyNot: "Často nebude top volba pro profil, který chce hlavně technickou strukturu nebo výsledek v praxi."
+    explanations: ["silný fit pro analýzu společnosti, norem a kulturních změn", "opírá se o schopnost propojovat text, terén i širší společenský rámec"],
+    whyNot: "Mívá nižší prioritu, pokud chceš pracovat téměř výhradně s technickým řešením a minimem sociálního kontextu."
   },
   {
     id: "technology_information_systems",
@@ -194,7 +194,7 @@ export const SUBJECTS = [
     cluster: "Language / Communication",
     ideal: { language_sensitivity: 0.98, text_orientation: 0.82, people_orientation: 0.35, cultural_curiosity: 0.58, presentation_energy: 0.34 },
     antiFit: { financial_orientation: 0.1, optimization_drive: 0.08 },
-    explanations: ["stojí na jemném jazykovém rozlišení a práci s významem"],
-    whyNot: "Méně sedí lidem, které táhne spíš systém, strategie nebo investiční rozhodování."
+    explanations: ["stojí na přesném převodu významu, tónu a kulturního kontextu", "je to náročná analytická disciplína, ne náhradní volba"],
+    whyNot: "Mívá nižší prioritu, pokud tě dlouhodobě víc nabíjí čistě procesní optimalizace nebo finanční rozhodování bez jazykové práce."
   }
 ];

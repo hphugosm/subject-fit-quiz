@@ -4,10 +4,10 @@ const SUBJECT_LOCALIZATION = {
   anthropology: {
     csName: 'Antropologie',
     enName: 'Anthropology',
-    csWhyNot: 'Může ztrácet u lidí, kteří chtějí hlavně jasný praktický výstup nebo hodně strukturované úkoly.',
-    enWhyNot: 'It may be a weaker fit for people who mainly want clear practical outputs or highly structured tasks.',
-    csFit: 'Sedí lidem, kteří chtějí chápat kulturu a rozdíly mezi lidmi.',
-    enFit: 'It fits people who want to understand culture and differences between people.'
+    csWhyNot: 'Bývá níž, pokud tě dlouhodobě naplňuje hlavně formální modelování, číselná optimalizace nebo čistě technický provoz.',
+    enWhyNot: 'It is usually lower if you are mainly energized by formal modeling, numerical optimization, or purely technical operations.',
+    csFit: 'Sedí lidem, kteří umí číst kulturní vzorce v chování lidí i institucí.',
+    enFit: 'It suits people who can read cultural patterns in human and institutional behavior.'
   },
   art_architecture: {
     csName: 'Umění a architektura',
@@ -20,10 +20,10 @@ const SUBJECT_LOCALIZATION = {
   classical_studies: {
     csName: 'Starověké a klasické studie',
     enName: 'Classical Studies',
-    csWhyNot: 'Často nesedí lidem, kteří chtějí rychlé využití a viditelný praktický dopad.',
-    enWhyNot: 'It often does not fit people who want quick application and visible practical impact.',
-    csFit: 'Sedí lidem s hlubším zájmem o historii a texty.',
-    enFit: 'It fits people with a deeper interest in history and texts.'
+    csWhyNot: 'Mívá slabší prioritu, pokud potřebuješ hlavně okamžitý operativní dopad a minimum delší textové analýzy.',
+    enWhyNot: 'It tends to be lower if you mainly need immediate operational impact and minimal long-form textual analysis.',
+    csFit: 'Sedí lidem, kteří skládají minulost z pramenů, pojmů a souvislostí.',
+    enFit: 'It fits people who reconstruct the past from sources, concepts, and context.'
   },
   creative_writing: {
     csName: 'Tvůrčí psaní',
@@ -60,18 +60,18 @@ const SUBJECT_LOCALIZATION = {
   language_linguistics: {
     csName: 'Řeč a jazykověda',
     enName: 'Language and Linguistics',
-    csWhyNot: 'Často nesedí profilům, které chtějí minimum textu a víc přímého použití nebo řízení výsledku.',
-    enWhyNot: 'It often does not fit profiles that want minimal text work and more direct application or control over results.',
-    csFit: 'Spojuje cit pro jazyk s analytickou prací.',
-    enFit: 'It combines language sensitivity with analytical work.'
+    csWhyNot: 'Může klesat, pokud nechceš pracovat s jazykovým detailem a preferuješ převážně rychlá rozhodnutí bez textu.',
+    enWhyNot: 'It may drop if you do not want to work with linguistic detail and prefer mostly fast decisions without text.',
+    csFit: 'Spojuje detailní cit pro jazyk s analytickou prací nad strukturou řeči.',
+    enFit: 'It combines fine-grained language sensitivity with analytical work on language structure.'
   },
   world_literature: {
     csName: 'Světová literatura',
     enName: 'World Literature',
-    csWhyNot: 'Slábne tam, kde člověk potřebuje jasnou strukturu a hmatatelný výsledek.',
-    enWhyNot: 'It becomes weaker when a person needs clear structure and a tangible result.',
-    csFit: 'Hodně stojí na práci s textem a kulturním kontextem.',
-    enFit: 'It strongly relies on text work and cultural context.'
+    csWhyNot: 'Mívá nižší prioritu, pokud tě dlouhodobě drží hlavně procesní optimalizace a minimální práce s textem.',
+    enWhyNot: 'It tends to be lower when you are mainly driven by process optimization and minimal text work.',
+    csFit: 'Silný fit pro dlouhodobé čtení textů v kulturním a historickém kontextu.',
+    enFit: 'A strong fit for long-form reading in cultural and historical context.'
   },
   law: {
     csName: 'Právo',
@@ -100,10 +100,10 @@ const SUBJECT_LOCALIZATION = {
   music: {
     csName: 'Hudba',
     enName: 'Music',
-    csWhyNot: 'Klesá u profilů, které nehledají sebevyjádření nebo estetickou tvorbu jako hlavní směr.',
-    enWhyNot: 'It tends to be weaker for profiles that do not see self-expression or aesthetic creation as a main direction.',
-    csFit: 'Sedí lidem s výraznou estetickou a tvůrčí orientací.',
-    enFit: 'It fits people with a strong aesthetic and creative orientation.'
+    csWhyNot: 'Bývá níž u profilů, které dlouhodobě preferují hlavně procesní kontrolu, formální modely a minimální estetickou složku práce.',
+    enWhyNot: 'It is usually lower for profiles that long-term prefer process control, formal models, and minimal aesthetic work.',
+    csFit: 'Sedí profilům s hudební představivostí, rytmickým citem a potřebou výrazu.',
+    enFit: 'It suits profiles with musical imagination, rhythmic sensitivity, and a need for expression.'
   },
   philosophy: {
     csName: 'Filosofie',
@@ -132,10 +132,10 @@ const SUBJECT_LOCALIZATION = {
   psychology_cognitive: {
     csName: 'Psychologie a poznávací vědy',
     enName: 'Psychology and Cognitive Science',
-    csWhyNot: 'Slábne, pokud profil nechce ani lidi, ani práci s chováním a jeho výkladem.',
-    enWhyNot: 'It becomes weaker if the profile is not interested in people or in understanding and interpreting behavior.',
-    csFit: 'Spojuje zájem o člověka s analytickou hloubkou.',
-    enFit: 'It combines interest in people with analytical depth.'
+    csWhyNot: 'Klesá, pokud nechceš systematicky sledovat chování lidí ani pracovat s interpretací dat a vzorců.',
+    enWhyNot: 'It drops if you do not want to systematically study human behavior or work with interpreted data patterns.',
+    csFit: 'Kombinuje práci s lidským chováním, hypotézami a analytickým ověřováním.',
+    enFit: 'It combines human behavior work with hypotheses and analytical validation.'
   },
   public_speaking: {
     csName: 'Řečnictví',
@@ -156,10 +156,10 @@ const SUBJECT_LOCALIZATION = {
   sociology_cultural: {
     csName: 'Sociologie a kulturní studia',
     enName: 'Sociology and Cultural Studies',
-    csWhyNot: 'Často nebude top volba pro profil, který chce hlavně technickou strukturu nebo výsledek v praxi.',
-    enWhyNot: 'It often will not be a top choice for a profile that mainly wants technical structure or practical results.',
-    csFit: 'Silný fit pro společenský a kulturní zájem.',
-    enFit: 'A strong fit for social and cultural interests.'
+    csWhyNot: 'Mívá nižší prioritu, pokud chceš pracovat téměř výhradně s technickým řešením a minimem sociálního kontextu.',
+    enWhyNot: 'It tends to be lower when you prefer almost exclusively technical solutions with minimal social context.',
+    csFit: 'Silný fit pro analýzu společnosti, norem a kulturních změn.',
+    enFit: 'A strong fit for analyzing society, norms, and cultural change.'
   },
   technology_information_systems: {
     csName: 'Technika a informační soustavy',
@@ -172,10 +172,10 @@ const SUBJECT_LOCALIZATION = {
   translation_interpretation: {
     csName: 'Tlumočení a překlad',
     enName: 'Translation and Interpretation',
-    csWhyNot: 'Méně sedí lidem, které táhne spíš systém, strategie nebo investiční rozhodování.',
-    enWhyNot: 'It fits less well for people who are drawn more to systems, strategy, or investment decisions.',
-    csFit: 'Stojí na jemném rozlišování jazyka a práce s významem.',
-    enFit: 'It is built on subtle language distinction and working with meaning.'
+    csWhyNot: 'Mívá nižší prioritu, pokud tě dlouhodobě víc nabíjí čistě procesní optimalizace nebo finanční rozhodování bez jazykové práce.',
+    enWhyNot: 'It tends to be lower if you are more energized by pure process optimization or finance decisions without language work.',
+    csFit: 'Stojí na přesném převodu významu, tónu a kulturního kontextu.',
+    enFit: 'It is built on precise transfer of meaning, tone, and cultural context.'
   }
 };
 

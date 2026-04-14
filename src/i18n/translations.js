@@ -139,65 +139,65 @@ let markdownQuestionOverrides = null;
 
 const CS_QUESTION_TEXT = {
   q1: {
-    prompt: 'Co tě na dlouhodobém projektu přitahuje nejvíc?',
-    hint: 'Vyber možnost, kterou bys nejspíš chtěl mít jako svou hlavní roli.',
+    prompt: 'Když máš v týmu volnější projekt, kterou roli si přirozeně vezmeš?',
+    hint: 'Vyber činnost, u které bys vydržel i po prvním nadšení.',
     options: {
-      a: 'zlepšit systém nebo postup, aby fungoval líp',
-      b: 'vymyslet strategii pro co nejlepší výsledek',
-      c: 'obhájit směr, názor nebo pravidla',
-      d: 'vytvořit vlastní nápad, sdělení nebo styl'
+      a: 'rozkreslit, jak celek funguje, a najít slabé místo v postupu',
+      b: 'pozorovat, jak lidé spolupracují, a vychytat motivaci v týmu',
+      c: 'uhlídat přesnost formulací a význam napříč jazyky',
+      d: 'vymyslet podobu výstupu, aby měl styl, rytmus a silný dojem'
     }
   },
   q2: {
-    prompt: 'Seřaď podle toho, co je pro tebe při studiu nejdůležitější.',
+    prompt: 'Seřaď, co tě při učení opravdu udrží ve flow.',
     hint: 'Nahoře = nejvíc, dole = nejméně.',
     options: {
-      a: 'praktické využití',
-      b: 'hloubka a porozumění',
-      c: 'strategie, výsledek a rozhodování',
-      d: 'vyjádření, styl a originalita'
+      a: 'skládat obraz tématu z různých zdrojů a stop',
+      b: 'pozorovat lidi a skupiny, hledat v nich opakující se vzorce',
+      c: 'navrhovat postup, který funguje i v reálném provozu',
+      d: 'pilovat formulaci, tón a přesnost významu'
     }
   },
   q3: {
-    prompt: 'Co by tě štvalo míň?',
+    prompt: 'Co by tě při semestrálním úkolu unavovalo méně?',
     hint: 'Posuvník ukazuje, ke které straně máš blíž.',
-    left: 'jasný problém s jedním dobrým řešením',
-    right: 'otevřený problém s více možnostmi výkladu'
+    left: 'úkol s jasnými kritérii a průběžným testováním řešení',
+    right: 'úkol, kde skládáš smysl z více výkladů a kontextů'
   },
   q4: {
-    prompt: 'Který typ výstupu by tě dlouhodobě bavil nejvíc?',
+    prompt: 'Který výstup by tě bavil dělat opakovaně i po několik týdnů?',
     options: {
-      a: 'návrh systému, postupu nebo nástroje',
-      b: 'rozbor investice, rizika nebo hodnoty',
-      c: 'obhajoba názoru na pravidla, moc nebo společnost',
-      d: 'vlastní tvorba nebo výklad'
+      a: 'diagnostika procesu a test, jestli navržené zlepšení funguje',
+      b: 'profil motivace týmu a návrh, jak rozdělit role',
+      c: 'kritické porovnání zdrojů a argumentů kolem sporného tématu',
+      d: 'kurátorský koncept výstavy, playlistu nebo mediální série'
     }
   },
   q5: {
-    prompt: 'Když narazíš na složitý problém, co je ti nejbližší?',
+    prompt: 'Když narazíš na komplikovaný problém, kde začneš nejspíš hledat pevný bod?',
     options: {
-      a: 'rozdělit ho na části a poskládat funkční řešení',
-      b: 'vybrat nejlepší strategii a hlídat výsledek',
-      c: 'zvážit, co je správné a co jde dobře obhájit',
-      d: 'hledat nové pohledy, významy a výklady'
+      a: 'v terénním pozorování lidí v odlišných prostředích',
+      b: 'v modelu variant, kritériích a porovnání rizik',
+      c: 'v přesném významu pojmů a formulaci napříč jazyky',
+      d: 've stavbě sdělení, které přesvědčí konkrétní publikum'
     }
   },
   q6: {
-    prompt: 'Co by tě nejspíš vyčerpávalo nejvíc?',
+    prompt: 'Co by tě po pár týdnech nejspíš vyčerpávalo nejvíc?',
     options: {
-      a: 'dlouhé nejasné výklady bez jasného výsledku',
-      b: 'technické nebo systémové detaily',
-      c: 'časté veřejné mluvení a obhajování před lidmi',
-      d: 'rozhodování podle hodnoty, rizika a výsledku'
+      a: 'dlouhé rozplétání významů bez jasného ukotvení',
+      b: 'technické dolaďování detailů a procesních kroků',
+      c: 'časté vystupování a okamžité reakce před lidmi',
+      d: 'práce s numerickým porovnáním variant a rizik'
     }
   },
   q7: {
-    prompt: 'Které téma tě přitahuje nejvíc?',
+    prompt: 'Který typ materiálu tě nejspíš vtáhne i mimo povinné úkoly?',
     options: {
-      a: 'technologie, systémy a jak fungují',
-      b: 'trh, hodnota, růst a rozhodování',
-      c: 'moc, pravidla, stát a dění ve světě',
-      d: 'kultura, jazyk, média a význam'
+      a: 'schémata, data, modely a návrhy fungování systémů',
+      b: 'případové situace o rozhodování pod nejistotou',
+      c: 'společenské konflikty, pravidla a legitimita rozhodnutí',
+      d: 'texty, jazyky, obrazy a kulturní kontext'
     }
   },
   q8: {
@@ -205,49 +205,49 @@ const CS_QUESTION_TEXT = {
     hint: 'To ovlivní míru jistoty, ne samotný obsah profilu.'
   },
   q9: {
-    prompt: 'Co tě láká víc?',
-    left: 'navrhnout lepší systém nebo informační řešení',
-    right: 'udělat lepší rozhodnutí s vyšší hodnotou nebo výnosem'
+    prompt: 'Co by tě víc bavilo ladit do hloubky?',
+    left: 'fungování nástroje nebo systému, aby byl spolehlivý a čitelný',
+    right: 'komunikaci a koordinaci mezi lidmi, aby tým fungoval bez tření'
   },
   q10: {
     prompt: 'Co zní přirozeněji jako tvoje silná stránka?',
     options: {
-      a: 'rozumět pravidlům, institucím a jejich dopadu',
-      b: 'vyhodnotit příležitost, strategii a výsledek',
-      c: 'chápat chování lidí a motivaci skupin',
-      d: 'pracovat s významem, jazykem nebo výkladem'
+      a: 'rozkrýt, kde jsou v argumentaci slabá místa a co je obhajitelné',
+      b: 'odhadnout, která varianta dává smysl při omezeních a riziku',
+      c: 'vysvětlit, proč skupiny reagují odlišně v podobných situacích',
+      d: 'uhlídat význam, tón a přesnost sdělení v textu i mluvení'
     }
   },
   q11: {
     prompt: 'Co bys radši dělal celý semestr?',
-    left: 'přesně číst texty, argumenty a pravidla',
-    right: 'volněji vykládat význam, kulturu a souvislosti'
+    left: 'pečlivě číst texty a dohledávat, co přesně znamenají v kontextu',
+    right: 'skládat souvislosti mezi kulturou, médii a každodenním chováním'
   },
   q12: {
     prompt: 'Kdybys měl dělat semestrální projekt, co by tě bavilo nejvíc?',
     options: {
-      a: 'návrh, jak zlepšit proces nebo systém',
-      b: 'případová studie rozhodnutí, hodnoty nebo investice',
-      c: 'analýza pravidel, institucí nebo moci',
-      d: 'kulturní nebo mediální výklad'
+      a: 'ověření, jak redesign procesu zvedne kvalitu služby',
+      b: 'analýza rozhodnutí pod rizikem s jasně popsanými kritérii',
+      c: 'srovnání zdrojů o pravidlech, moci a legitimním postupu',
+      d: 'interpretace kulturního díla, média nebo jazykového jevu'
     }
   },
   q13: {
     prompt: 'V jaké roli bys asi působil nejpřesvědčivěji?',
     options: {
-      a: 'ten, kdo prezentuje a obhajuje řešení před lidmi',
-      b: 'ten, kdo v pozadí navrhuje systém nebo postup',
-      c: 'ten, kdo volí strategii a hlídá rizika',
-      d: 'ten, kdo dává věcem význam a kontext'
+      a: 'řečník nebo moderátor, který drží pozornost publika',
+      b: 'autor metodiky, který nastaví funkční proces v pozadí',
+      c: 'koordinátor, který skládá role lidí a hlídá průběh',
+      d: 'interpret textu nebo jazyka, který zpřesní význam'
     }
   },
   q14: {
     prompt: 'Která vrstva souvislostí tě zajímá nejvíc?',
     options: {
-      a: 'historický vývoj a dlouhé dějiny',
-      b: 'kultury, identity a významy',
-      c: 'státy, instituce a mezinárodní svět',
-      d: 'trhy, hodnota a reálná rozhodnutí'
+      a: 'jak se minulost skládá z pramenů, stop a přepisů významu',
+      b: 'jak prostředí a kultura mění chování skupin i jednotlivců',
+      c: 'jak instituce a státy udržují řád nebo vytvářejí konflikt',
+      d: 'jak se v nejistotě rozhoduje o hodnotě, riziku a prioritách'
     }
   },
   q15: {
@@ -511,17 +511,14 @@ export async function loadContentOverridesFromMarkdown(path = './TRANSLATION_TOD
     const markdown = await response.text();
 
     const uiParsed = parseUiTableFromMarkdown(markdown);
-    const questionsParsed = parseQuestionsFromMarkdown(markdown);
-
     markdownUiOverrides = {
       cs: deepMerge(CS, uiParsed.cs || {}),
       en: deepMerge(EN, uiParsed.en || {})
     };
 
-    markdownQuestionOverrides = {
-      cs: deepMerge(CS_QUESTION_TEXT, questionsParsed.cs || {}),
-      en: deepMerge(EN_QUESTION_TEXT, questionsParsed.en || {})
-    };
+    // Keep question text sourced from code to avoid drift between localized prompts and scoring effects.
+    // Markdown overrides are currently used only for UI copy.
+    markdownQuestionOverrides = null;
 
     return true;
   } catch {
