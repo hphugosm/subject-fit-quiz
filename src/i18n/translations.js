@@ -258,65 +258,65 @@ const CS_QUESTION_TEXT = {
 
 const EN_QUESTION_TEXT = {
   q1: {
-    prompt: 'What attracts you most in a long-term project?',
-    hint: 'Choose the option you would most likely want as your main role.',
+    prompt: 'When your team gets a more open project, which role would you naturally take?',
+    hint: 'Choose the activity you would still enjoy after the first excitement fades.',
     options: {
-      a: 'improve a system or process so it works better',
-      b: 'come up with a strategy for the best possible result',
-      c: 'defend a direction, opinion, or set of rules',
-      d: 'create your own concept, message, or style'
+      a: 'map how the whole thing works and find the weak point in the process',
+      b: 'observe how people collaborate and tune motivation in the team',
+      c: 'keep wording precise and meaning consistent across languages',
+      d: 'shape the output so it has style, rhythm, and a strong impression'
     }
   },
   q2: {
-    prompt: 'Rank these by what matters most to you in studying.',
+    prompt: 'Rank what keeps you in flow while learning.',
     hint: 'Top = most important, bottom = least important.',
     options: {
-      a: 'practical use',
-      b: 'depth and understanding',
-      c: 'strategy, results, and decision-making',
-      d: 'expression, style, and originality'
+      a: 'build a full picture from different sources and clues',
+      b: 'observe people and groups and spot recurring patterns',
+      c: 'design a process that works in real operation',
+      d: 'refine phrasing, tone, and precision of meaning'
     }
   },
   q3: {
-    prompt: 'What would frustrate you less?',
+    prompt: 'What would drain you less in a semester task?',
     hint: 'The slider shows which side feels closer to you.',
-    left: 'a clear problem with one good solution',
-    right: 'an open problem with several valid interpretations'
+    left: 'a task with clear criteria and ongoing solution testing',
+    right: 'a task where you build meaning from multiple interpretations and contexts'
   },
   q4: {
-    prompt: 'Which type of output would keep you interested the longest?',
+    prompt: 'Which output would you enjoy producing repeatedly over several weeks?',
     options: {
-      a: 'designing a system, process, or tool',
-      b: 'analysing an investment, risk, or value',
-      c: 'defending an opinion about rules, power, or society',
-      d: 'your own creative or interpretive output'
+      a: 'process diagnostics and testing whether an improvement really works',
+      b: 'a team motivation profile and a proposal for role allocation',
+      c: 'critical comparison of sources and arguments around a disputed topic',
+      d: 'a curatorial concept for an exhibition, playlist, or media series'
     }
   },
   q5: {
-    prompt: 'When you face a complex problem, what feels most natural to you?',
+    prompt: 'When you face a complex problem, where do you most likely look for a stable starting point?',
     options: {
-      a: 'break it into parts and build a workable solution',
-      b: 'choose the best strategy and keep an eye on the result',
-      c: 'consider what is right and what can be defended well',
-      d: 'look for new angles, meanings, and interpretations'
+      a: 'in field observation of people across different environments',
+      b: 'in a model of options, criteria, and risk comparison',
+      c: 'in precise meaning of terms and formulation across languages',
+      d: 'in structuring a message that convinces a specific audience'
     }
   },
   q6: {
-    prompt: 'What would most likely drain you the most?',
+    prompt: 'What would most likely wear you out after a few weeks?',
     options: {
-      a: 'long unclear interpretations without a clear outcome',
-      b: 'technical or system details',
-      c: 'frequent public speaking and defending your view in front of people',
-      d: 'making decisions based on value, risk, and outcomes'
+      a: 'long untangling of meanings without clear anchoring',
+      b: 'technical fine-tuning of details and process steps',
+      c: 'frequent presenting and immediate reactions in front of people',
+      d: 'work based on numerical comparison of options and risks'
     }
   },
   q7: {
-    prompt: 'Which topic attracts you the most?',
+    prompt: 'Which type of material is most likely to pull you in beyond mandatory tasks?',
     options: {
-      a: 'technology, systems, and how they work',
-      b: 'market, value, growth, and decision-making',
-      c: 'power, rules, the state, and world affairs',
-      d: 'culture, language, media, and meaning'
+      a: 'diagrams, data, models, and how systems are designed to function',
+      b: 'case situations about decision-making under uncertainty',
+      c: 'social conflicts, rules, and legitimacy of decisions',
+      d: 'texts, languages, visuals, and cultural context'
     }
   },
   q8: {
@@ -324,49 +324,49 @@ const EN_QUESTION_TEXT = {
     hint: 'This affects the confidence level, not the profile content itself.'
   },
   q9: {
-    prompt: 'What attracts you more?',
-    left: 'design a better system or information solution',
-    right: 'make a better decision with higher value or return'
+    prompt: 'What would you enjoy tuning in depth more?',
+    left: 'how a tool or system works so it is reliable and readable',
+    right: 'communication and coordination between people so the team works smoothly'
   },
   q10: {
     prompt: 'Which sounds more naturally like your strength?',
     options: {
-      a: 'understanding rules, institutions, and their impact',
-      b: 'evaluating an opportunity, strategy, and result',
-      c: 'understanding people\'s behavior and group motivation',
-      d: 'working with meaning, language, or interpretation'
+      a: 'spotting weak points in arguments and what is defensible',
+      b: 'judging which option makes sense under constraints and risk',
+      c: 'explaining why groups react differently in similar situations',
+      d: 'keeping meaning, tone, and precision consistent in text and speech'
     }
   },
   q11: {
     prompt: 'What would you rather do for a whole semester?',
-    left: 'closely read texts, arguments, and rules',
-    right: 'more freely interpret meaning, culture, and context'
+    left: 'read texts carefully and track what they exactly mean in context',
+    right: 'connect culture, media, and everyday behavior into a coherent picture'
   },
   q12: {
     prompt: 'If you had to do a semester project, what would interest you the most?',
     options: {
-      a: 'a proposal for improving a process or system',
-      b: 'a case study of a decision, value, or investment',
-      c: 'an analysis of rules, institutions, or power',
-      d: 'a cultural or media interpretation'
+      a: 'verification of how a process redesign improves service quality',
+      b: 'analysis of a risky decision with explicitly defined criteria',
+      c: 'comparison of sources about rules, power, and legitimate procedure',
+      d: 'interpretation of a cultural work, media artifact, or language phenomenon'
     }
   },
   q13: {
     prompt: 'In which role would you probably come across as the most convincing?',
     options: {
-      a: 'the person presenting and defending a solution in front of people',
-      b: 'the person in the background designing a system or process',
-      c: 'the person choosing the strategy and watching the risks',
-      d: 'the person giving things meaning and context'
+      a: 'a speaker or moderator who keeps the audience engaged',
+      b: 'a method designer who sets up a robust process in the background',
+      c: 'a coordinator who aligns people\'s roles and keeps delivery on track',
+      d: 'a text or language interpreter who sharpens meaning'
     }
   },
   q14: {
     prompt: 'Which layer of context interests you the most?',
     options: {
-      a: 'historical development and long-term history',
-      b: 'cultures, identities, and meanings',
-      c: 'states, institutions, and the international world',
-      d: 'markets, value, and real-world decisions'
+      a: 'how the past is reconstructed from sources, traces, and rewritten meanings',
+      b: 'how environment and culture shape behavior of groups and individuals',
+      c: 'how institutions and states maintain order or generate conflict',
+      d: 'how value, risk, and priorities are decided under uncertainty'
     }
   },
   q15: {

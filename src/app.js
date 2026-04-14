@@ -7,6 +7,9 @@ import { collectQuestionAnswer, exportResultsToDocx, renderDebug, renderQuestion
 import { getUiStrings, loadContentOverridesFromMarkdown, localizeQuestion } from './i18n/translations.js';
 import { buildLocalizedNarrative, localizeContradictions, localizeRankedSubjects } from './i18n/results-localization.js';
 
+const DEBUG_ENABLED = new URLSearchParams(window.location.search).get('debug') === '1';
+if (DEBUG_ENABLED) document.body.classList.add('debug-enabled');
+
 let state = createInitialState();
 let pendingQuestion = null;
 let askedCount = 0;
@@ -195,10 +198,12 @@ function updateResults() {
     }
   };
   renderResults(lastResultsPayload);
+  if (!DEBUG_ENABLED) return;
   renderDebug(localizedState, rankedSubjects, getUiStrings(currentLocale), currentLocale, coverageAuditLines);
 }
 
 function renderLiveDebug() {
+  if (!DEBUG_ENABLED) return;
   const rankedSubjects = localizeRankedSubjects(scoreSubjects(state, currentMode), currentLocale);
   const localizedState = {
     ...state,

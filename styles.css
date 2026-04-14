@@ -531,6 +531,10 @@ input {
   backdrop-filter: blur(8px);
 }
 
+body.debug-enabled .side-panel {
+  display: block;
+}
+
 .debug-block {
   margin-bottom: 16px;
 }
@@ -645,7 +649,7 @@ input:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .side-panel {
+  body.debug-enabled .side-panel {
     display: block;
     position: sticky;
     top: 84px;
