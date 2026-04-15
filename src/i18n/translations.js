@@ -1,5 +1,5 @@
 const CS = {
-  brandEyebrow: 'Powered by Tým Trampolin for ACGA',
+  brandEyebrow: 'Powered by Tým Trampolín',
   restart: 'Restart',
   heroBadge: 'Průvodce výběrem předmětů',
   siteTitle: 'Subject Fit Engine',
@@ -66,7 +66,7 @@ const CS = {
 };
 
 const EN = {
-  brandEyebrow: 'Powered by Tým Trampolin for ACGA',
+  brandEyebrow: 'Powered by Tým Trampolín',
   restart: 'Restart',
   heroBadge: 'Subject selection guide',
   siteTitle: 'Subject Fit Engine',
