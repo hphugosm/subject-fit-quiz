@@ -6,7 +6,7 @@ Dopln sloupec EN a potom to vratim do kodu.
 
 | Klic | CS | EN |
 |---|---|---|
-| brandEyebrow | Academic Vanguard |  |
+| brandEyebrow | Powered by Tym Trampolin |  |
 | restart | Restart |  |
 | heroBadge | Pruvodce vyberem predmetu |  |
 | heroTitle | Najdi predmety, ktere ti sednou profilem i stylem prace. |  |
